@@ -1,0 +1,65 @@
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
+
+export const HeroSection = () => {
+  return (
+    <section className="relative bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100 overflow-hidden min-h-[80vh] flex items-center">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          {/* Main Content */}
+          <div className="space-y-6">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+              Transforma tu
+              <br />
+              <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                Hogar Ideal
+              </span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Descubre productos de calidad premium para cada rincón de tu hogar. Desde
+              dormitorio hasta cocina, tenemos todo lo que necesitas para crear el espacio
+              perfecto.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+
+            <Link to="/catalog"
+            >
+              <div
+                className="bg-gradient-to-r flex items-center from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                Explorar Catálogo
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </div>
+            </Link>
+            <a href="#categories"
+            >
+              <div
+                className="border-pink-300 text-pink-600 hover:bg-pink-50 bg-transparent border border-input shadow-sm px-8 py-4 text-lg rounded-full duration-300">
+                Ver Categorias
+              </div>
+            </a>
+          </div>
+
+          {/* Stats */}
+          <div className="flex justify-center space-x-12 pt-12">
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-gray-900">500+</div>
+              <div className="text-sm text-gray-600 mt-1">Productos</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-gray-900">50+</div>
+              <div className="text-sm text-gray-600 mt-1">Marcas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Decorative elements */}
+      <div className="absolute top-20 left-10 w-20 h-20 bg-pink-200 rounded-full opacity-60 animate-pulse"></div>
+      <div className="absolute bottom-20 right-10 w-32 h-32 bg-purple-200 rounded-full opacity-40 animate-pulse delay-300"></div>
+      <div className="absolute -z-40 md:z-0 top-1/2 right-20 w-16 h-16 bg-pink-300 rounded-full opacity-50 animate-pulse delay-700"></div>
+    </section>
+  );
+};
