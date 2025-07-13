@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { categories } from '@/data/products';
 
 const categoryImages = {
