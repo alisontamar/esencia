@@ -63,12 +63,12 @@ export const FilterSidebar = ({
     (filters.search ? 1 : 0);
 
   return (
-    <div className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}>
+    <div className={`bg-white rounded-lg border border-gray-200 md:p-6 ${className}`}>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-black">Filtros</h2>
         {activeFiltersCount > 0 && (
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={onClearFilters}
             className="text-gray-500 hover:text-black"

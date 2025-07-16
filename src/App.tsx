@@ -6,6 +6,7 @@ import { CatalogPage } from '@/pages/CatalogPage';
 import { ProductPage } from '@/pages/ProductPage';
 import { BrandPage } from '@/pages/BrandPage';
 import { Toaster } from '@/components/ui/toaster';
+import { Analytics } from '@vercel/analytics/react';
 import './App.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         </main>
         <Footer />
         <Toaster />
+        <Analytics />
       </div>
     </Router>
   );

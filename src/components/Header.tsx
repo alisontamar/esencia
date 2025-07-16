@@ -54,7 +54,7 @@ export const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex justify-center items-center gap-8">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -69,7 +69,7 @@ export const Header = () => {
             {/* Brands Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-sm font-medium text-gray-600 hover:text-pink-500">
+                <Button variant="ghost" className="text-sm w-auto font-medium text-gray-600 hover:text-pink-500">
                   Marcas
                   <ChevronDown className="ml-1 h-4 w-4" />
                 </Button>

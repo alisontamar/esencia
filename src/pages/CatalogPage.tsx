@@ -21,14 +21,14 @@ export const CatalogPage = () => {
 
   // Apply URL params to filters
   useEffect(() => {
-  const category = searchParams.get('category');
-  const brand = searchParams.get('brand');
+    const category = searchParams.get('category');
+    const brand = searchParams.get('brand');
 
-  updateFilters({
-    category: category ? [category] : undefined,
-    brand: brand ? [brand] : undefined,
-  });
-}, [searchParams]);
+    updateFilters({
+      category: category ? [category] : undefined,
+      brand: brand ? [brand] : undefined,
+    });
+  }, [searchParams]);
 
   // Simulate loading
   useEffect(() => {
@@ -71,15 +71,15 @@ export const CatalogPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         {/* Results Count */}
-        <div className="mb-6 px-4">
-          <p className="text-gray-600">
+        <div className="mb-3 sm:mb-6 px-2 sm:px-4">
+          <p className="text-gray-600 text-sm sm:text-base">
             Mostrando {sortedProducts.length} productos
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Desktop Sidebar */}
           {!isMobile && (
             <div className="lg:w-80 flex-shrink-0">
@@ -94,27 +94,26 @@ export const CatalogPage = () => {
           {/* Main Content */}
           <div className="flex-1">
             {/* Toolbar */}
-            <div className="flex items-center justify-between mb-6 bg-white p-4 rounded-2xl shadow-sm">
-              <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center justify-between mb-4 sm:mb-6 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm gap-2">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 {isMobile && (
                   <MobileFilterDrawer
                     filters={filters}
                     onFiltersChange={updateFilters}
                     onClearFilters={clearFilters}
-                    productCount={sortedProducts.length}
                   />
                 )}
-                
-                <span className="text-sm text-gray-600">
+
+                <span className="text-xs sm:text-sm text-gray-600">
                   {sortedProducts.length} productos
                 </span>
               </div>
 
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 {/* Sort */}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 sm:space-x-2">
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-32 rounded-full">
+                    <SelectTrigger className="w-24 sm:w-32 rounded-full text-xs sm:text-base">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -123,7 +122,6 @@ export const CatalogPage = () => {
                       <SelectItem value="brand">Marca</SelectItem>
                     </SelectContent>
                   </Select>
-                  
                   <Button
                     variant="outline"
                     size="icon"

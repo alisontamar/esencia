@@ -8,14 +8,12 @@ interface MobileFilterDrawerProps {
   filters: Filters;
   onFiltersChange: (filters: Partial<Filters>) => void;
   onClearFilters: () => void;
-  productCount: number;
 }
 
 export const MobileFilterDrawer = ({ 
   filters, 
   onFiltersChange, 
   onClearFilters, 
-  productCount 
 }: MobileFilterDrawerProps) => {
   const activeFiltersCount = 
     filters.brand.length + 
@@ -47,11 +45,6 @@ export const MobileFilterDrawer = ({
             onClearFilters={onClearFilters}
             className="border-0 p-0"
           />
-        </div>
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className="text-sm text-gray-600 mb-2">
-            {productCount} productos encontrados
-          </div>
         </div>
       </SheetContent>
     </Sheet>
