@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { Contact } from '@/components/Contact';
 import { HomePage } from '@/pages/HomePage';
 import { CatalogPage } from '@/pages/CatalogPage';
 import { ProductPage } from '@/pages/ProductPage';
@@ -12,8 +13,9 @@ import './App.css';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen">
         <Header />
+        <Contact />
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
