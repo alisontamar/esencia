@@ -24,7 +24,7 @@ function App() {
         </main>
         <Footer />
         <Toaster />
-        <Analytics />
+        {import.meta.env.MODE === 'production' && <Analytics mode="production" />}
       </div>
     </Router>
   );
