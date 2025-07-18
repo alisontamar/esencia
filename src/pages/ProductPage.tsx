@@ -3,9 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { Plus, Minus, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { products } from '@/data/products';
-import { toast } from '@/hooks/use-toast';
 import { ProductGrid } from '@/components/ProductGrid';
 import { ProductImageZoom } from "@/components/ProductImageZoom";
+import { handleWhatsAppClick } from '@/lib/utils';
 
 export const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,25 +25,6 @@ export const ProductPage = () => {
     return () => clearTimeout(timer);
   }, [id]);
 
-  const handleWhatsAppClick = () => {
-    // let message = `Hola! Me interesa el producto: ${product.name} de ${product.brand}.`
-
-    // if (quantity === 1) {
-    //   message += ` Precio: $${product.price}`
-    // } else {
-    //   message += ` Cantidad: ${quantity} unidades. Precio unitario: $${product.price}. Total: $${totalPrice}`
-    // }
-
-    let message = `Me gustaria este sitio para mi tienda, por favor, más información`
-
-    const phoneNumber = "79710328"
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, "_blank");
-    toast({
-      title: "Mensaje enviado",
-      description: "Te has comunicado por WhatsApp para hacer tu pedido.",
-    });
-  }
   
   const getCategoryName = (category: string) => {
     const categories = {
