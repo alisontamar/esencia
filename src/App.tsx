@@ -6,8 +6,8 @@ import { HomePage } from '@/pages/HomePage';
 import { CatalogPage } from '@/pages/CatalogPage';
 import { ProductPage } from '@/pages/ProductPage';
 import { BrandPage } from '@/pages/BrandPage';
-import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@vercel/analytics/react';
+import { Toaster } from "react-hot-toast"
 import './App.css';
 
 function App() {
@@ -25,8 +25,8 @@ function App() {
           </Routes>
         </main>
         <Footer />
-        <Toaster />
         {import.meta.env.MODE === 'production' && <Analytics mode="production" />}
+        <Toaster position="top-right" reverseOrder={false} />
       </div>
     </Router>
   );
