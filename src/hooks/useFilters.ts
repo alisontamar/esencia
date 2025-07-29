@@ -9,12 +9,14 @@ export interface Filters {
 }
 
 export const useFilters = (products: Product[]) => {
+    
     const [filters, setFilters] = useState<Filters>({
         brand: [],
         category: [],
         priceRange: null,
         search: '',
     });
+
 
     const filteredProducts = useMemo(() => {
         return products.filter((product) => {
