@@ -64,7 +64,7 @@ export default function DynamicProductForm({ onClose }: { onClose: () => void })
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type, checked } = e.target as HTMLInputElement;
     let val;
     if (type === 'checkbox') val = checked;
     else if (type === 'number') val = Number(value);
