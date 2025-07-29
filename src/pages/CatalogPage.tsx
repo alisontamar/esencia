@@ -16,8 +16,18 @@ export const CatalogPage = () => {
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const isMobile = useMobile();
+  // 1. Leer del sessionStorage de forma segura
+  const storedProducts = sessionStorage.getItem('products');
+  let productsFromStorage = [];
+  try {
+    productsFromStorage = storedProducts ? JSON.parse(storedProducts) : [];
+  } catch (error) {
+    console.error('Error parsing stored products:', error);
+    productsFromStorage = [];
+  }
 
-  const { filters, filteredProducts, updateFilters, clearFilters } = useFilters(products);
+  const allProducts = [...products, ...productsFromStorage];
+  const { filters, filteredProducts, updateFilters, clearFilters } = useFilters(allProducts);
 
   // Apply URL params to filters
   useEffect(() => {

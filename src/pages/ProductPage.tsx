@@ -12,12 +12,22 @@ export const ProductPage = () => {
   const [product, setProduct] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-
+  
+  const storedProducts = sessionStorage.getItem('products');
+  let productsFromStorage = [];
+  try {
+    productsFromStorage = storedProducts ? JSON.parse(storedProducts) : [];
+  } catch (error) {
+    console.error('Error parsing stored products:', error);
+    productsFromStorage = [];
+  }
   useEffect(() => window.scrollTo(0, 0), []);
 
   useEffect(() => {
+    const allProducts = [...products, ...productsFromStorage];
+
     const timer = setTimeout(() => {
-      const foundProduct = products.find(p => p.id === id);
+      const foundProduct = allProducts.find(p => Number(p.id) === Number(id));
       setProduct(foundProduct);
       setIsLoading(false);
     }, 500);
@@ -25,7 +35,7 @@ export const ProductPage = () => {
     return () => clearTimeout(timer);
   }, [id]);
 
-  
+
   const getCategoryName = (category: string) => {
     const categories = {
       bedroom: "Dormitorio",
