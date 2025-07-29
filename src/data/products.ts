@@ -23,7 +23,7 @@ export const brands: Brand[] = [
     logo: "https://images.pexels.com/photos/1667088/pexels-photo-1667088.jpeg?auto=compress&cs=tinysrgb&w=200&h=100&fit=crop"
   },
   {
-    id: "2", 
+    id: "2",
     name: "Chanel",
     logo: "https://images.pexels.com/photos/1667088/pexels-photo-1667088.jpeg?auto=compress&cs=tinysrgb&w=200&h=100&fit=crop"
   },
@@ -59,7 +59,7 @@ export const products: Product[] = [
     image: "https://images.pexels.com/photos/1667088/pexels-photo-1667088.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
     description: "Juego de sábanas de algodón 100% premium con diseño elegante y suave al tacto.",
     featured: true,
-    stock: 25
+    stock: 25,
   },
   {
     id: "2",
@@ -181,12 +181,14 @@ export const products: Product[] = [
     description: "Fragancia masculina con notas amaderadas y especiadas. Elegante y sofisticado.",
     featured: true,
     stock: 12
-  }
+  },
+  
+  
 ];
 
 export const categories = [
   "Perfumes",
-  "Maquillaje", 
+  "Maquillaje",
   "Cuidado facial",
   "Cuidado corporal"
 ];
