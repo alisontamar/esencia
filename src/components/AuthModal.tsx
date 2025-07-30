@@ -59,7 +59,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                             Iniciar Sesión
                         </h2>
                         <p className="text-white/90">
-                            Accede a tu cuenta para publicar lugares
+                            Accede a tu cuenta para publicar productos
                         </p>
                         <p className="text-white/90 bg-pink-500 text-center py-2 rounded-xl">
                             Contáctame para obtener las credenciales
