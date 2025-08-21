@@ -24,4 +24,4 @@ pnpm run dev
 ```
 #### Si no eres colaborador puedes participar y crear tu rama de feature
 
-Si no cuenta con el instalador de paquetes pnpm, puede explorar el proceso de instalación <a target="_blanck" href="https://pnpm.io/es/installation">aquí</a>
+Si no cuenta con el instalador de paquetes pnpm, puede explorar el proceso de instalación <a target="_blank" href="https://pnpm.io/es/installation" rel="noopener">aquí</a>
