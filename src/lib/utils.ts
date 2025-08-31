@@ -22,3 +22,4 @@ export function handleWhatsAppClick() {
   )}`;
   window.open(whatsappUrl, "_blank");
 }
+
