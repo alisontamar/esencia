@@ -1,34 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, SprayCan } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-type OfferType = 'fixed' | 'percentage';
-
-interface Product {
-  id: number;
-  brand: string;
-  description: string;
-  category: string;
-  quantity: number;
-  name: string;
-  price: number;
-  isOffer: boolean;
-  offerType: OfferType;
-  offerValue: number;
-  offerUntil?: string;
-  image: string | null;
-  isHighlighted: boolean;
-}
-
-const categories = [
-  'Cuidado facial',
-  'Maquillaje',
-  'Perfumes',
-  'Cuidado corporal',
-];
+import { useCategory } from '@/hooks/useCategory';
 
 export default function DynamicProductForm({ onClose }: { onClose: () => void }) {
-  const [product, setProduct] = useState<Product>({
+  const [product, setProduct] = useState({
     id: new Date().getTime(),
     brand: '',
     description: '',
@@ -43,6 +19,8 @@ export default function DynamicProductForm({ onClose }: { onClose: () => void })
     image: null,
     isHighlighted: false,
   });
+
+  const { categories } = useCategory();
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [finalPrice, setFinalPrice] = useState<number>(0);
@@ -85,13 +63,13 @@ export default function DynamicProductForm({ onClose }: { onClose: () => void })
     if (!file) return;
     const reader = new FileReader();
     reader.onloadend = () => {
-      setProduct((p) => ({ ...p, image: reader.result as string }));
+      // setProduct((p) => ({ ...p, image: reader.result as string }));
       setImagePreview(reader.result as string);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (finalPrice > product.price) {
       toast.error('El precio final no puede ser mayor que el precio original');
@@ -102,7 +80,6 @@ export default function DynamicProductForm({ onClose }: { onClose: () => void })
       toast.error('Todos los campos son obligatorios, a excepción de oferta');
       return;
     }
-
     const stored = JSON.parse(sessionStorage.getItem('products') || '[]');
     sessionStorage.setItem('products', JSON.stringify([...stored, product]));
     toast.success('Producto guardado!');
@@ -206,8 +183,8 @@ export default function DynamicProductForm({ onClose }: { onClose: () => void })
                 className="dropdown-menu w-full p-3 border-2 bg-pink-300/20 text-white"
               >
                 <option value="" disabled>Seleccione una categoría</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
+                {categories?.map((cat) => (
+                  <option key={cat.id} value={cat.nombre}>{cat.nombre}</option>
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
