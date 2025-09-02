@@ -1,6 +1,7 @@
 import { products } from '@/data/products';
 import { ProductGrid } from './ProductGrid';
 
+
 export const FeaturedProducts = () => {
 
   // 1. Leer del sessionStorage de forma segura
