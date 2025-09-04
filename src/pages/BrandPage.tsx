@@ -1,12 +1,14 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { products, categories } from '@/data/products';
+import { products } from '@/data/products';
 import { ProductGrid } from '@/components/ProductGrid';
 import { Badge } from '@/components/ui/badge';
 import { useEffect } from 'react';
+import { useCategory } from '@/hooks/useCategory';
 
 export const BrandPage = () => {
   const { name } = useParams<{ name: string }>();
+  const {categories} = useCategory();
   const decodedName = decodeURIComponent(name || '');
   
   const brandProducts = products.filter(

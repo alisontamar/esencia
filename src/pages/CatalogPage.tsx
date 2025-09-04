@@ -8,25 +8,17 @@ import { FilterSidebar } from '@/components/FilterSidebar';
 import { MobileFilterDrawer } from '@/components/MobileFilterDrawer';
 import { useFilters } from '@/hooks/useFilters';
 import { useMobile } from '@/hooks/useMobile';
+import { useProducts } from '@/hooks/useProducts';
+import { Product } from '@/types/database.types';
 
 export const CatalogPage = () => {
   const [searchParams] = useSearchParams();
-  const [isLoading, setIsLoading] = useState(true);
-  const [sortBy, setSortBy] = useState('name');
+  const { products, loading } = useProducts();
+  const [sortBy, setSortBy] = useState('nombre');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const isMobile = useMobile();
-  // 1. Leer del sessionStorage de forma segura
-  const storedProducts = sessionStorage.getItem('products');
-  let productsFromStorage = [];
-  try {
-    productsFromStorage = storedProducts ? JSON.parse(storedProducts) : [];
-  } catch (error) {
-    console.error('Error parsing stored products:', error);
-    productsFromStorage = [];
-  }
 
-  const allProducts = [...products, ...productsFromStorage];
-  const { filters, filteredProducts, updateFilters, clearFilters } = useFilters(allProducts);
+  const { filters, filteredProducts, updateFilters, clearFilters } = useFilters(products);
 
   // Apply URL params to filters
   useEffect(() => {
@@ -34,41 +26,31 @@ export const CatalogPage = () => {
     const brand = searchParams.get('brand');
 
     updateFilters({
-      category: category ? [category] : undefined,
-      brand: brand ? [brand] : undefined,
+      categoria: category ? [category] : undefined,
+      marca: brand ? [brand] : undefined,
     });
+
   }, [searchParams]);
 
-  // Simulate loading
-  useEffect(() => {
-    window.scrollTo({
-      top: 0
-    })
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Sort products
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
+  const sortedProducts = filteredProducts.sort((a: Product, b: Product) => {
     let aValue: string | number;
     let bValue: string | number;
-
     switch (sortBy) {
-      case 'price':
-        aValue = a.price;
-        bValue = b.price;
+      case 'precio':
+        aValue = a.precio_base;
+        bValue = b.precio_base;
         break;
-      case 'name':
-        aValue = a.name.toLowerCase();
-        bValue = b.name.toLowerCase();
+      case 'nombre':
+        aValue = a.nombre.toLowerCase();
+        bValue = b.nombre.toLowerCase();
         break;
-      case 'brand':
-        aValue = a.brand.toLowerCase();
-        bValue = b.brand.toLowerCase();
+      case 'marca':
+        aValue = a.marcas.nombre.toLowerCase() || "";
+        bValue = b.marcas.nombre.toLowerCase() || "";
         break;
       default:
-        aValue = a.name.toLowerCase();
-        bValue = b.name.toLowerCase();
+        aValue = a.nombre.toLowerCase();
+        bValue = b.nombre.toLowerCase();
     }
 
     if (sortOrder === 'asc') {
@@ -78,13 +60,15 @@ export const CatalogPage = () => {
     }
   });
 
+
+  console.log(filters)
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100">
+    <section className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100">
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         {/* Results Count */}
         <div className="mb-3 sm:mb-6 px-2 sm:px-4">
           <p className="text-gray-600 text-sm sm:text-base">
-            Mostrando {sortedProducts.length} productos
+            Mostrando {filteredProducts.length} productos
           </p>
         </div>
 
@@ -114,7 +98,7 @@ export const CatalogPage = () => {
                 )}
 
                 <span className="text-xs sm:text-sm text-gray-600">
-                  {sortedProducts.length} productos
+                  {products.length} productos
                 </span>
               </div>
 
@@ -126,9 +110,9 @@ export const CatalogPage = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="name">Nombre</SelectItem>
-                      <SelectItem value="price">Precio</SelectItem>
-                      <SelectItem value="brand">Marca</SelectItem>
+                      <SelectItem value="nombre">Nombre</SelectItem>
+                      <SelectItem value="precio">Precio</SelectItem>
+                      <SelectItem value="marca">Marca</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button
@@ -148,10 +132,10 @@ export const CatalogPage = () => {
             </div>
 
             {/* Product Grid */}
-            <ProductGrid products={sortedProducts} isLoading={isLoading} />
+            <ProductGrid products={sortedProducts} isLoading={loading} />
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
