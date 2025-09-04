@@ -1,59 +1,44 @@
 import { useState, useMemo } from 'react';
-import { Product } from '@/data/products';
 
-export interface Filters {
-    brand: string[];
-    category: string[];
-    priceRange: { min: number; max: number } | null;
-    search: string;
-}
+export const useFilters = (products) => {
 
-export const useFilters = (products: Product[]) => {
-    
-    const [filters, setFilters] = useState<Filters>({
-        brand: [],
-        category: [],
-        priceRange: null,
-        search: '',
-    });
+    const [filters, setFilters] = useState([{
+        marca: [],
+        categoria: [],
+        precio: { min: 0, max: 0 },
+        busqueda: '',
+    }]);
 
+    const filterBrands = filters[0].marca;
+    const filtersCategories = filters[0].categoria;
+    const filtersSearch = filters[0].busqueda;
 
+    console.log(products)
     const filteredProducts = useMemo(() => {
-        return products.filter((product) => {
+        return products?.filter((product) => {
             // Filter by brand
             if (
-                filters.length > 0 &&
-                !filters.brand.includes(product.brand)
+                !filterBrands.includes(product?.marcas?.nombre as string)
             ) {
                 return false;
             }
-
             // Filter by category
             if (
-                filters.category.length > 0 &&
-                !filters.category.includes(product.category)
-            ) {
+                !filtersCategories.includes(product?.categoria_nombre as string) &&
+                filtersCategories.length > 0
+            )
                 return false;
-            }
-
-            // Filter by price range
-            if (filters.priceRange) {
-                const { min, max } = filters.priceRange;
-                if (product.price < min || product.price > max) {
-                    return false;
-                }
-            }
 
             // Filter by search
-            if (filters.search) {
-                const searchLower = filters.search.toLowerCase();
-                const matchesName = product.name
+            if (filtersSearch) {
+                const searchLower = filtersSearch.toLowerCase();
+                const matchesName = product?.nombre
                     .toLowerCase()
                     .includes(searchLower);
-                const matchesBrand = product.brand
+                const matchesBrand = product?.marcas?.nombre
                     .toLowerCase()
                     .includes(searchLower);
-                const matchesCategory = product.category
+                const matchesCategory = product?.categoria_nombre || ""
                     .toLowerCase()
                     .includes(searchLower);
 
@@ -66,29 +51,29 @@ export const useFilters = (products: Product[]) => {
         });
     }, [products, filters]);
 
-    const updateFilters = (newFilters: Partial<Filters>) => {
-        setFilters((prev) => ({
-            brand: Array.isArray(newFilters.brand)
-                ? newFilters.brand
-                : prev.brand,
-            category: Array.isArray(newFilters.category)
-                ? newFilters.category
-                : prev.category,
-            priceRange: newFilters.priceRange ?? prev.priceRange,
-            search:
-                typeof newFilters.search === 'string'
-                    ? newFilters.search
-                    : prev.search,
-        }));
+    const updateFilters = (newFilters) => {
+        setFilters((prev) => ([{
+            marca: Array.isArray(newFilters.marca)
+                ? newFilters.marca
+                : prev[0].marca,
+            categoria: Array.isArray(newFilters.categoria)
+                ? newFilters.categoria
+                : prev[0].categoria,
+            precio: newFilters.precio ?? prev[0].precio,
+            busqueda:
+                typeof newFilters.busqueda === 'string'
+                    ? newFilters.busqueda
+                    : prev[0].busqueda,
+        }]));
     };
 
     const clearFilters = () => {
-        setFilters({
-            brand: [],
-            category: [],
-            priceRange: null,
-            search: '',
-        });
+        setFilters([{
+            marca: [],
+            categoria: [],
+            precio: { min: 0, max: 0 },
+            busqueda: '',
+        }]);
     };
 
     return {
