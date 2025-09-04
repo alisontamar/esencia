@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
-import { ProductWithOffer } from '@/types/database.types';
+import { Product } from '@/types/database.types';
 
 interface ProductCardProps {
-  product: ProductWithOffer;
+  product: Product;
   className?: string;
 }
 
@@ -31,13 +31,13 @@ export const ProductCard = ({ product, className = "" }: ProductCardProps) => {
         {/* Marca */}
         <div className="mb-1">
           <span className="text-xs text-gray-500 uppercase tracking-wide">
-            {product.marca_nombre ?? "Genérico"}
+            {product?.marcas?.nombre}
           </span>
         </div>
 
         {/* Nombre */}
         <h3 className="font-medium text-gray-800 mb-4 text-sm group-hover:text-pink-600 transition-colors flex-grow">
-          {product.nombre}
+          {product?.nombre}
         </h3>
 
         {/* Precio + botón */}
