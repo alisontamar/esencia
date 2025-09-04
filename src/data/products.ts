@@ -186,16 +186,9 @@ export const products: Product[] = [
   
 ];
 
-export const categories = [
-  "Perfumes",
-  "Maquillaje",
-  "Cuidado facial",
-  "Cuidado corporal"
-];
-
 export const priceRanges = [
-  { label: "Menos de $30", min: 0, max: 30 },
-  { label: "$30 - $60", min: 30, max: 60 },
-  { label: "$60 - $100", min: 60, max: 100 },
-  { label: "Más de $100", min: 100, max: 1000 }
+  { label: "Menos de Bs30", min: 0, max: 30 },
+  { label: "Bs30 - Bs60", min: 30, max: 60 },
+  { label: "Bs60 - Bs100", min: 60, max: 100 },
+  { label: "Más de Bs100", min: 100, max: 1000 }
 ];
