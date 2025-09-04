@@ -6,22 +6,19 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
-import { Filters } from '@/hooks/useFilters';
-import { categories, priceRanges } from '@/data/products';
-
-interface FilterSidebarProps {
-  filters: Filters;
-  onFiltersChange: (filters: Partial<Filters>) => void;
-  onClearFilters: () => void;
-  className?: string;
-}
+import { useCategory } from '@/hooks/useCategory';
+import { useBrand } from '@/hooks/useBrand';
 
 export const FilterSidebar = ({
   filters,
   onFiltersChange,
   onClearFilters,
   className = ""
-}: FilterSidebarProps) => {
+}) => {
+
+  const { categories } = useCategory();
+  const { brands } = useBrand();
+
   const [openSections, setOpenSections] = useState({
     search: true,
     brand: true,
@@ -38,21 +35,25 @@ export const FilterSidebar = ({
 
   const handleCategoryChange = (category: string, checked: boolean) => {
     const newCategories = checked
-      ? [...filters.category, category]
-      : filters.category.filter(c => c !== category);
+      ? [...filters[0].categoria, category]
+      : filters[0].categoria.filter(c => c !== category);
 
-    onFiltersChange({ category: newCategories });
+    onFiltersChange({ categoria: newCategories });
   };
 
-  const handlePriceRangeChange = (range: { min: number; max: number }) => {
-    onFiltersChange({ priceRange: range });
+  const handleBrandChange = (brand: string, checked: boolean) => {
+    const newBrands = checked
+      ? [...filters[0].marca, brand]
+      : filters[0].marca.filter(c => c !== brand);
+
+    onFiltersChange({ marca: newBrands });
   };
 
   const activeFiltersCount =
-    filters.brand.length +
-    filters.category.length +
-    (filters.priceRange ? 1 : 0) +
-    (filters.search ? 1 : 0);
+    filters[0].marca.length +
+    filters[0].categoria.length +
+    (filters[0].precio.max > 0 || filters[0].precio.min > 0 ? 1 : 0) +
+    (filters[0].busqueda ? 1 : 0);
 
   return (
     <div className={`bg-white rounded-lg border border-gray-200 md:p-6 ${className}`}>
@@ -105,18 +106,27 @@ export const FilterSidebar = ({
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3">
             <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={`brand-natura`}
-                  checked={true}
-                />
-                <Label
-                  htmlFor={`brand-natura`}
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Natura
-                </Label>
-              </div>
+              {
+                brands?.map((brand) => (
+                  <div key={brand.id} className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`brand-${brand.nombre}`}
+                        checked={filters[0].marca.includes(brand.nombre)}
+                        onCheckedChange={(checked) =>
+                          handleBrandChange(brand.nombre, checked as boolean)
+                        }
+                      />
+                      <Label
+                        htmlFor={`brand-${brand.nombre}`}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {brand.nombre}
+                      </Label>
+                    </div>
+                  </div>
+                ))
+              }
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -135,20 +145,20 @@ export const FilterSidebar = ({
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3">
             <div className="space-y-3">
-              {categories.map((category) => (
-                <div key={category} className="flex items-center space-x-2">
+              {categories?.map((category) => (
+                <div key={category.id} className="flex items-center space-x-2">
                   <Checkbox
                     id={`category-${category}`}
-                    checked={filters.category.includes(category)}
+                    checked={filters[0].categoria.includes(category.nombre)}
                     onCheckedChange={(checked) =>
-                      handleCategoryChange(category, checked as boolean)
+                      handleCategoryChange(category.nombre, checked as boolean)
                     }
                   />
                   <Label
-                    htmlFor={`category-${category}`}
+                    htmlFor={`category-${category.nombre}`}
                     className="text-sm font-normal cursor-pointer"
                   >
-                    {category}
+                    {category.nombre}
                   </Label>
                 </div>
               ))}
@@ -157,46 +167,6 @@ export const FilterSidebar = ({
         </Collapsible>
 
         <Separator />
-
-        {/* Price Range Filter */}
-        <Collapsible open={openSections.price} onOpenChange={() => toggleSection('price')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full">
-            <span className="font-medium text-black">Precio</span>
-            {openSections.price ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-3">
-            <div className="space-y-3">
-              {priceRanges.map((range, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`price-${index}`}
-                    checked={
-                      filters.priceRange?.min === range.min &&
-                      filters.priceRange?.max === range.max
-                    }
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        handlePriceRangeChange(range);
-                      } else {
-                        onFiltersChange({ priceRange: null });
-                      }
-                    }}
-                  />
-                  <Label
-                    htmlFor={`price-${index}`}
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    {range.label}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
       </div>
     </div>
   );
