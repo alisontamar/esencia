@@ -6,7 +6,8 @@ export const AnalyticsService = {
         const { data, error } = await supabase
             .from('v_productos_mas_solicitados')
             .select('*')
-            .limit(20);
+            .limit(1)
+            .order('total_consultas', { ascending: false })
 
         if (error) throw error;
         return data || [];

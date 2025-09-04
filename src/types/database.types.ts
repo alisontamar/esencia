@@ -24,13 +24,14 @@ export interface Product {
   categoria_id?: string;
   cantidad: number;
   precio_base: number;
-  moneda: string;
+  moneda?: string;
   imagen_url?: string;
   esta_en_oferta: boolean;
   es_destacado: boolean;
-  activo: boolean;
+  activo?: boolean;
   created_at: string;
   updated_at: string;
+  marcas?: {nombre: string};
 }
 
 export interface Offer {
@@ -101,7 +102,9 @@ export interface CreateOfferData {
 
 export interface ProductsContextType {
   // State
-  products: ProductWithOffer[];
+  products: Product[];
+  selectedProduct: Product | null;
+  productsByCategory: ProductByCategory[];
   categories: Category[];
   brands: Brand[];
   mostRequestedProducts: MostRequestedProduct[];
@@ -114,6 +117,8 @@ export interface ProductsContextType {
   createCategory: (name: string, description?: string) => Promise<void>;
   fetchBrands: () => Promise<void>;
   createBrand: (name: string, description?: string) => Promise<void>;
+  fetchProductsByCategory: () => Promise<void>;
+  registerWhatsAppConsultation: (productId: string, sessionData?: Partial<ConsultationData>) => Promise<void>;
 }
 
 export interface ProductFilters {
@@ -126,6 +131,22 @@ export interface ProductFilters {
   maxPrice?: number;
   limit?: number;
   offset?: number;
+}
+
+export interface ProductByCategory extends Product {
+  id: string;
+  nombre: string;
+  descripcion?: string;
+  activo: boolean;
+  precio_base: number;
+  moneda?: string;
+  imagen_url?: string;  
+  esta_en_oferta: boolean;
+  es_destacado: boolean;
+  categoria: string;
+  cantidad: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ConsultationData {
