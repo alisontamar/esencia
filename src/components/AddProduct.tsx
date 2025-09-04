@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { X, SprayCan } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCategory } from '@/hooks/useCategory';
-import { useProducts } from "@/hooks/useProducts";
 import { supabase } from '@/model/createClient';
 import { useBrand } from '@/hooks/useBrand';
 
@@ -17,14 +16,14 @@ export default function DynamicProductForm({ onClose }: { onClose: () => void })
     quantity: 0,
     price: 0,
     isOffer: false,
-    offerType: 'fixed',
+    offerType: 'precio_fijo',
     offerValue: 0,
     offerUntil: undefined,
     image: null,
     isHighlighted: false,
   });
-  const { createProduct } = useProducts();
-const { brands } = useBrand();
+
+  const { brands } = useBrand();
 
 
   const { categories } = useCategory();
@@ -65,102 +64,102 @@ const { brands } = useBrand();
     setProduct((p) => ({ ...p, isHighlighted: e.target.checked }));
   };
 
- const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
-const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const uploadedFile = e.target.files?.[0];
-  if (!uploadedFile) return;
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const uploadedFile = e.target.files?.[0];
+    if (!uploadedFile) return;
 
-  setFile(uploadedFile); // guardamos el archivo real
+    setFile(uploadedFile); // guardamos el archivo real
 
-  const reader = new FileReader();
-  reader.onloadend = () => {
-    setImagePreview(reader.result as string); // solo para previsualizar
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string); // solo para previsualizar
+    };
+    reader.readAsDataURL(uploadedFile);
   };
-  reader.readAsDataURL(uploadedFile);
-};
-
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (finalPrice > product.price) {
-    toast.error("El precio final no puede ser mayor que el precio original");
-    return;
-  }
-
-  if (
-    product.brand === "" ||
-    product.description === "" ||
-    product.category === "" ||
-    product.quantity === 0 ||
-    product.price === 0 ||
-    !file
-  ) {
-    toast.error("Todos los campos son obligatorios, a excepción de oferta");
-    return;
-  }
-
-  try {
-    // 1. Subir imagen a Supabase Storage
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const { error: uploadError } = await supabase.storage
-      .from("products")
-      .upload(fileName, file);
-
-    if (uploadError) throw uploadError;
-
-    // 2. Obtener URL pública
-    const { data: urlData } = supabase.storage
-      .from("products")
-      .getPublicUrl(fileName);
-
-    const imageUrl = urlData.publicUrl;
-
-    // 3. Insertar producto en DB
-    const { data: insertedProduct, error: insertError } = await supabase
-      .from("productos")
-      .insert([
-        {
-          nombre: product.name,
-          descripcion: product.description,
-          marca_id: product.brand,       // 👈 debe ser UUID
-          categoria_id: product.category, // 👈 debe ser UUID
-          cantidad: product.quantity,
-          precio_base: product.price,
-          imagen_url: imageUrl,
-          esta_en_oferta: product.isOffer,
-          es_destacado: product.isHighlighted,
-        },
-      ])
-      .select()
-      .single();
-
-    if (insertError) throw insertError;
-
-    // 4. Si tiene oferta, insertarla en tabla `ofertas`
-    if (product.isOffer) {
-      const { error: offerError } = await supabase.from("ofertas").insert([
-        {
-          producto_id: insertedProduct.id,
-          tipo_oferta: product.offerType || "precio_fijo",
-          valor_descuento: product.offerValue || 0,
-          precio_especial: finalPrice,
-          precio_final: finalPrice,
-          fecha_fin: product.offerUntil || null,
-        },
-      ]);
-      if (offerError) throw offerError;
+    if (finalPrice > product.price) {
+      toast.error("El precio final no puede ser mayor que el precio original");
+      return;
     }
 
-    toast.success("Producto guardado en la base de datos!");
-    onClose();
-  } catch (error) {
-    console.error(error);
-    toast.error("Error al guardar el producto");
-  }
-};
+    if (
+      product.brand === "" ||
+      product.description === "" ||
+      product.category === "" ||
+      product.quantity === 0 ||
+      product.price === 0 ||
+      !file
+    ) {
+      toast.error("Todos los campos son obligatorios, a excepción de oferta");
+      return;
+    }
+
+    try {
+      // 1. Subir imagen a Supabase Storage
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from("products")
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // 2. Obtener URL pública
+      const { data: urlData } = supabase.storage
+        .from("products")
+        .getPublicUrl(fileName);
+
+      const imageUrl = urlData.publicUrl;
+
+      // 3. Insertar producto en DB
+      const { data: insertedProduct, error: insertError } = await supabase
+        .from("productos")
+        .insert([
+          {
+            nombre: product.name,
+            descripcion: product.description,
+            marca_id: product.brand,       // 👈 debe ser UUID
+            categoria_id: product.category, // 👈 debe ser UUID
+            cantidad: product.quantity,
+            precio_base: product.price,
+            imagen_url: imageUrl,
+            esta_en_oferta: product.isOffer,
+            es_destacado: product.isHighlighted,
+          },
+        ])
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // 4. Si tiene oferta, insertarla en tabla `ofertas`
+      if (product.isOffer) {
+        console.log(product.offerType);
+        const { error: offerError } = await supabase.from("ofertas").insert([
+          {
+            producto_id: insertedProduct.id,
+            tipo_oferta: product.offerType || "precio_fijo",
+            valor_descuento: product.offerValue || 0,
+            precio_especial: finalPrice,
+            precio_final: finalPrice,
+            fecha_fin: product.offerUntil || null,
+          },
+        ]);
+        if (offerError) throw offerError;
+      }
+
+      toast.success("Producto publicado!");
+      onClose();
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al guardar el producto");
+    }
+  };
 
 
   return (
@@ -193,6 +192,7 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 
         <form onSubmit={handleSubmit} className="relative z-10 md:px-8 px-2 pb-8 max-h-[70vh] overflow-y-auto">
           {/* Brand */}
+
           <div className='flex flex-col md:flex-row md:gap-4'>
             <div className="mb-6 md:w-1/2 w-full">
               <label className="block text-sm text-white font-medium mb-2 uppercase tracking-wider">Nombre del producto</label>
@@ -203,7 +203,7 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                   onChange={handleChange}
                   required
                   placeholder="Ej: Oréal Paris Skin Care"
-                  maxLength={25}
+                  maxLength={50}
                   className="w-full bg-pink-300/20 placeholder:text-white text-white border border-gray-200 rounded-lg px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all duration-200 shadow-sm hover:shadow-md"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -215,19 +215,19 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
               <label className="block text-sm text-white font-medium mb-2 uppercase tracking-wider">Marca</label>
               <div className="relative">
                 <select
-  name="brand"
-  value={product.brand}
-  onChange={handleChange}
-  required
-  className="dropdown-menu w-full p-3 border-2 bg-pink-300/20 text-white rounded-lg"
->
-  <option value="" disabled>Seleccione una marca</option>
-  {brands?.map((brand) => (
-    <option key={brand.id} value={brand.id}>
-      {brand.nombre}
-    </option>
-  ))}
-</select>
+                  name="brand"
+                  value={product.brand}
+                  onChange={handleChange}
+                  required
+                  className="dropdown-menu w-full p-3 border-2 bg-pink-300/20 text-white rounded-lg"
+                >
+                  <option value="" disabled>Seleccione una marca</option>
+                  {brands?.map((brand) => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.nombre}
+                    </option>
+                  ))}
+                </select>
 
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                   <svg className="w-5 h-5 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -259,17 +259,17 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
             <label className="block text-sm text-white font-medium mb-2 uppercase tracking-wider">Categoría</label>
             <div className="relative">
               <select
-  name="category"
-  value={product.category}
-  onChange={handleChange}
-  required
-  className="dropdown-menu w-full p-3 border-2 bg-pink-300/20 text-white"
->
-  <option value="" disabled>Seleccione una categoría</option>
-  {categories?.map((cat) => (
-    <option key={cat.id} value={cat.id}>{cat.nombre}</option>
-  ))}
-</select>
+                name="category"
+                value={product.category}
+                onChange={handleChange}
+                required
+                className="dropdown-menu w-full p-3 border-2 bg-pink-300/20 text-white"
+              >
+                <option value="" disabled>Seleccione una categoría</option>
+                {categories?.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                ))}
+              </select>
 
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -357,10 +357,10 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                       name="offerType"
                       value={product.offerType}
                       onChange={handleChange}
-                      className="w-full bg-white border border-gray-200 rounded-lg px-5 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all duration-200 shadow-sm"
+                      className="w-full bg-white border cursor-pointer border-gray-200 rounded-lg px-5 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all duration-200 shadow-sm"
                     >
-                      <option value="fixed">Precio fijo</option>
-                      <option value="percentage">Porcentaje</option>
+                      <option value="precio_fijo">Precio fijo</option>
+                      <option value="porcentaje_descuento">Porcentaje</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -372,22 +372,22 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {product.offerType === 'fixed' ? 'Precio especial' : 'Descuento (%)'}
+                    {product.offerType === 'precio_fijo' ? 'Precio especial' : 'Descuento (%)'}
                   </label>
                   <div className="relative">
                     <input
                       name="offerValue"
                       type="number"
                       min={0}
-                      max={product.offerType === 'percentage' ? 100 : undefined}
+                      max={product.offerType === 'porcentaje_descuento' ? 100 : undefined}
                       value={product.offerValue === 0 ? '' : product.offerValue}
                       onChange={handleChange}
-                      placeholder={product.offerType === 'fixed' ? 'Bs. 0.00' : '0-100%'}
+                      placeholder={product.offerType === 'precio_fijo' ? 'Bs. 0.00' : '0-100%'}
                       className="w-full bg-white border border-gray-200 rounded-lg px-5 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all duration-200 shadow-sm"
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                       <span className="text-gray-400">
-                        {product.offerType === 'fixed' ? 'Bs.' : '%'}
+                        {product.offerType === 'precio_fijo' ? 'Bs.' : '%'}
                       </span>
                     </div>
                   </div>
