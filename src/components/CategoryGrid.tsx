@@ -27,7 +27,7 @@ const categoryColors = [
 
 export const CategoryGrid = () => {
   const { categories } = useCategory();
-  console.log(categories);
+
   return (
     <section id='categories' className="py-16 bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100">
       <div className="container mx-auto px-4">
