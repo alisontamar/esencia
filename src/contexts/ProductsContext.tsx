@@ -1,9 +1,9 @@
+import { createContext, ReactNode, useEffect, useState } from 'react';
 import { AnalyticsService } from '@/lib/services/analytics';
 import { BrandService } from '@/lib/services/brands';
 import { CategoryService } from '@/lib/services/categories';
 import { ProductService } from '@/lib/services/products';
-import { Category, Brand, ProductWithOffer, MostRequestedProduct, CreateProductData, ProductFilters, ProductsContextType } from '@/types/database.types';
-import { createContext, ReactNode, useEffect, useState } from 'react';
+import { Category, Brand, Product, MostRequestedProduct, CreateProductData, ConsultationData, ProductFilters, ProductsContextType, ProductByCategory } from '@/types/database.types';
 
 
 // Create context
@@ -13,11 +13,12 @@ export const ProductsContext = createContext<ProductsContextType | undefined>(un
 export default function ProductsProvider({ children }: { children: ReactNode }) {
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
-    const [products, setProducts] = useState<ProductWithOffer[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
     const [mostRequestedProducts, setMostRequestedProducts] = useState<MostRequestedProduct[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [productsByCategory, setProductsByCategory] = useState<ProductByCategory[]>([]);
     useEffect(() => {
         loadingData();
     }, []);
@@ -30,9 +31,10 @@ export default function ProductsProvider({ children }: { children: ReactNode }) 
 
         setCategories(categories);
         setBrands(brands);
-        setProducts(products as ProductWithOffer[]);
+        setProducts(products as Product[]);
         setMostRequestedProducts(mostRequestedProducts);
         setLoading(false);
+
     };
 
     // Product operations
@@ -42,7 +44,7 @@ export default function ProductsProvider({ children }: { children: ReactNode }) 
             setError(null);
 
             const products = await ProductService.productsOffer(filters);
-            setProducts(products as ProductWithOffer[]);
+            setProducts(products as Product[]);
         } catch (error) {
             if (error instanceof Error) {
                 setError(error.message);
@@ -58,7 +60,7 @@ export default function ProductsProvider({ children }: { children: ReactNode }) 
             setError(null);
 
             const product = await ProductService.fetchProductById(id);
-            setProducts([product!]);
+            setSelectedProduct(product);
         } catch (error) {
             if (error instanceof Error) {
                 setError(error.message);
@@ -74,7 +76,23 @@ export default function ProductsProvider({ children }: { children: ReactNode }) 
             setError(null);
 
             const product = await ProductService.createProduct(data);
-            setProducts([product as ProductWithOffer]);
+            setProducts([product as Product]);
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchProductsByCategory = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const products = await ProductService.fetchProductsByCategory();
+            setProductsByCategory(products as ProductByCategory[]);
         } catch (error) {
             if (error instanceof Error) {
                 setError(error.message);
@@ -150,10 +168,30 @@ export default function ProductsProvider({ children }: { children: ReactNode }) 
         }
     };
 
+    const registerWhatsAppConsultation = async (productId: string, sessionData?: Partial<ConsultationData>) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const isRegistered = await AnalyticsService.registerWhatsAppConsultation(productId, sessionData);
+            if (isRegistered) {
+                setMostRequestedProducts([...mostRequestedProducts]);
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <ProductsContext.Provider value={
             {
                 products,
+                selectedProduct,
+                productsByCategory,
                 categories,
                 brands,
                 mostRequestedProducts,
@@ -166,6 +204,9 @@ export default function ProductsProvider({ children }: { children: ReactNode }) 
                 createCategory,
                 fetchBrands,
                 createBrand,
+                fetchProductsByCategory,
+                registerWhatsAppConsultation,
+
             }
         }>
             {children}
