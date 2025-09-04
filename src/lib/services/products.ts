@@ -1,5 +1,5 @@
 import { supabase } from "@/model/createClient";
-import { CreateProductData, Product, ProductFilters, ProductWithOffer } from "@/types/database.types";
+import { CreateProductData, Product, ProductFilters, ProductByCategory } from "@/types/database.types";
 
 export const ProductService = {
     async productsOffer(filters?: ProductFilters): Promise<Product[]> {
@@ -41,15 +41,29 @@ export const ProductService = {
         if (error) throw error;
         return data || [];
     },
-    async fetchProducts(): Promise<Product[] | null> {
+
+    async fetchProducts(): Promise<Product[] | []> {
         const { data, error } = await supabase
             .from('productos')
-            .select('*')
+            .select(`
+                id,
+                nombre, descripcion, categoria_id, activo,
+                cantidad, precio_base, moneda, imagen_url, esta_en_oferta, es_destacado,
+                created_at, updated_at,
+                marcas(nombre)
+                `)
             .eq('activo', true)
             .order('nombre');
 
         if (error) throw error;
-        return data || [];
+
+        return (data ?? []).map((item): Product => ({
+            ...item,
+            marcas: Array.isArray(item.marcas)
+                ? item.marcas[0]
+                : item.marcas ?? { nombre: "Genérico" },
+        }));
+
     },
 
     async createProduct(product: CreateProductData): Promise<Product | null> {
@@ -90,7 +104,7 @@ export const ProductService = {
         return data;
     },
 
-    async fetchProductById(id: string): Promise<ProductWithOffer | null> {
+    async fetchProductById(id: string): Promise<Product> {
         const { data, error } = await supabase
             .from('productos')
             .select('*')
@@ -98,7 +112,23 @@ export const ProductService = {
             .single();
 
         if (error) throw error;
+        return data || [];
+    },
+    
+    async fetchProductsByCategory(): Promise<ProductByCategory[] | []> {
+        const { data, error } = await supabase
+            .from('productos')
+            .select('id, nombre, descripcion, activo, precio_base, moneda, imagen_url, esta_en_oferta, es_destacado, categorias(nombre), cantidad, created_at, updated_at')
+            .order('cantidad', { ascending: false })
 
-        return data;
-    },  
+        if (error) throw error
+
+        return (data ?? []).map((item): ProductByCategory => ({
+            ...item,
+            categoria: Array.isArray(item?.categorias)
+                ? item?.categorias[0]?.nombre
+                : item?.categorias ?? "",
+        }));
+    },
+
 };

@@ -4,7 +4,6 @@ import { useProducts } from '@/hooks/useProducts';
 export const FeaturedProducts = () => {
   const { products, loading, error } = useProducts();
 
-  // 2. Estado de carga y errores
   if (loading) {
     return <p className="text-center py-10">Cargando productos...</p>;
   }
