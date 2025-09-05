@@ -21,16 +21,20 @@ export const CatalogPage = () => {
   const { filters, filteredProducts, updateFilters, clearFilters } = useFilters(products);
 
   // Apply URL params to filters
-  useEffect(() => {
-    const category = searchParams.get('category');
-    const brand = searchParams.get('brand');
+useEffect(() => {
+  const category = searchParams.get('category');
+  const brand = searchParams.get('brand');
 
-    updateFilters({
-      categoria: category ? [category] : undefined,
-      marca: brand ? [brand] : undefined,
-    });
+  const newFilters: any = {};
 
-  }, [searchParams]);
+ if (category) newFilters.categoria = category; // sin array
+
+  if (brand) newFilters.marca = [brand];
+
+  updateFilters(newFilters);
+}, [searchParams]);
+
+
 
   const sortedProducts = filteredProducts.sort((a: Product, b: Product) => {
     let aValue: string | number;
@@ -61,7 +65,7 @@ export const CatalogPage = () => {
   });
 
 
-  console.log(filters)
+  console.log(products, filters, filteredProducts)
   return (
     <section className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100">
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">

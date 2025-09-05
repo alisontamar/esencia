@@ -137,16 +137,20 @@ export const ProductPage = () => {
 
               {/* WhatsApp Button */}
               <div className="space-y-4">
-                <Button onClick={() => {
-                  handleWhatsAppClick()
-                  registerWhatsAppConsultation(product?.id as string)
-                }}
-                  size="lg" className="w-full bg-green-500 hover:bg-green-600 text-white">
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  {quantity === 1
-                    ? `Consultar por WhatsApp - $${product?.precio_base}`
-                    : `Consultar por WhatsApp - ${quantity} unidades (${product?.moneda} )`}
-                </Button>
+               <Button
+  onClick={() => {
+    handleWhatsAppClick(product, quantity);
+    registerWhatsAppConsultation(product?.id as string);
+  }}
+  size="lg"
+  className="w-full bg-green-500 hover:bg-green-600 text-white"
+>
+  <MessageCircle className="w-5 h-5 mr-2" />
+  {quantity === 1
+    ? `Consultar por WhatsApp - $${product?.precio_base}`
+    : `Consultar por WhatsApp - ${quantity} unidades (${product?.moneda})`}
+</Button>
+
 
                 {/* Price breakdown for multiple items */}
                 {quantity > 1 && (
