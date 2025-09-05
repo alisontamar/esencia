@@ -9,6 +9,7 @@ import AddProductForm from './AddProduct';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/services/supabaseClient';
 import toast from 'react-hot-toast';
+import { SprayCan } from 'lucide-react';
 
 
 export const Header = () => {
@@ -26,21 +27,21 @@ export const Header = () => {
     return location.pathname === path;
   };
 
-const { products } = useProducts();
+  const { products } = useProducts();
 
   // Filter products based on search query
   const searchSuggestions = products
-  ?.filter(product =>
-    product.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.marcas?.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.categoria_nombre?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-  .slice(0, 5);
+    ?.filter(product =>
+      product.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.marcas?.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.categoria_nombre?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .slice(0, 5);
 
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-const { user, loading } = useAuth();
+  const { user } = useAuth();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
   return (
@@ -48,15 +49,16 @@ const { user, loading } = useAuth();
       <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-gray-100">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
-            <div className='flex items-baseline'>
+            <div className='flex items-center'>
               {/* Logo */}
               <Link to="/" className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">E</span>
-                </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold flex gap-1 items-center bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
+                  <svg className="w-6 h-6 text-pink-500 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2c-.791 0-1.55.314-2.11.874l-.893.893a.985.985 0 0 1-.696.288H7.04A2.984 2.984 0 0 0 4.055 7.04v1.262a.986.986 0 0 1-.288.696l-.893.893a2.984 2.984 0 0 0 0 4.22l.893.893a.985.985 0 0 1 .288.696v1.262a2.984 2.984 0 0 0 2.984 2.984h1.262c.261 0 .512.104.696.288l.893.893a2.984 2.984 0 0 0 4.22 0l.893-.893a.985.985 0 0 1 .696-.288h1.262a2.984 2.984 0 0 0 2.984-2.984V15.7c0-.261.104-.512.288-.696l.893-.893a2.984 2.984 0 0 0 0-4.22l-.893-.893a.985.985 0 0 1-.288-.696V7.04a2.984 2.984 0 0 0-2.984-2.984h-1.262a.985.985 0 0 1-.696-.288l-.893-.893A2.984 2.984 0 0 0 12 2Zm3.683 7.73a1 1 0 1 0-1.414-1.413l-4.253 4.253-1.277-1.277a1 1 0 0 0-1.415 1.414l1.985 1.984a1 1 0 0 0 1.414 0l4.96-4.96Z" clip-rule="evenodd" />
+                  </svg>
+
                   Esencia
-                </span>
+                </h1>
               </Link>
 
               {/* Desktop Navigation */}
@@ -93,23 +95,23 @@ const { user, loading } = useAuth();
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     className="pl-10 w-64 bg-gray-50 border-gray-200 focus:bg-white focus:border-pink-300"
                   />
-                <Button
-  className="bg-pink-500 hover:bg-pink-600 text-white"
-  onClick={() => user ? setIsPostModalOpen(true) : setIsLoginModalOpen(true)}
->
-  {user ? 'Publicar' : 'Iniciar Sesión'}
-</Button>
-{user && (
-  <Button
-    className="ml-2 bg-red-500 hover:bg-red-600 text-white"
-    onClick={async () => {
-      await supabase.auth.signOut();
-      toast.success('Sesión cerrada 🎉');
-    }}
-  >
-    Cerrar sesión
-  </Button>
-)}
+                  <Button
+                    className="bg-pink-500 hover:bg-pink-600 text-white"
+                    onClick={() => user ? setIsPostModalOpen(true) : setIsLoginModalOpen(true)}
+                  >
+                    {user ? 'Publicar' : 'Iniciar Sesión'}
+                  </Button>
+                  {user && (
+                    <Button
+                      className="ml-2 bg-red-500 hover:bg-red-600 text-white"
+                      onClick={async () => {
+                        await supabase.auth.signOut();
+                        toast.success('Sesión cerrada 🎉');
+                      }}
+                    >
+                      Cerrar sesión
+                    </Button>
+                  )}
 
                 </div>
                 {/* Search Suggestions */}
@@ -202,16 +204,16 @@ const { user, loading } = useAuth();
                           }}
                           className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                         >
-                         <img src={product.imagen_url} alt={product.nombre}
-                          className="w-10 h-10 object-cover rounded-lg mr-3"
-                        />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                            {product.nombre}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {product.marcas?.nombre} • ${product.precio_base}
-                          </p>
+                          <img src={product.imagen_url} alt={product.nombre}
+                            className="w-10 h-10 object-cover rounded-lg mr-3"
+                          />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                              {product.nombre}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {product.marcas?.nombre} • ${product.precio_base}
+                            </p>
                           </div>
                         </Link>
                       ))}
