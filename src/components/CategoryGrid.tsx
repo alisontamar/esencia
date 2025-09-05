@@ -49,7 +49,7 @@ export const CategoryGrid = () => {
           {categories?.map((category, index) => (
             <Link
               key={category.id}
-              to={`/catalog?category=${category.nombre.split(' ').join('-').toLowerCase()}`}
+             to={`/catalog?category=${encodeURIComponent(category.nombre)}`}
               className="group"
             >
               <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 border-0 rounded-3xl bg-white">

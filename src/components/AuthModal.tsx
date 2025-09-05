@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import toast from 'react-hot-toast';
+import { supabase } from '@/lib/services/supabaseClient';
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -16,21 +17,29 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     });
     const [error, setError] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        const {
-            VITE_CREDENCIAL_EMAIL: email,
-            VITE_CREDENCIAL_PASSWORD: password
-        } = import.meta.env;
-        if (email === formData.email && password === formData.password) {
-            sessionStorage.setItem('user', JSON.stringify(formData));
-            onClose();
-            toast.success("Registro exitoso 🎉");
-        } else {
-            setError('Credenciales incorrectas');
-        }
-    };
+   
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    // Intentamos iniciar sesión con Supabase
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+    });
+
+    if (error) {
+        setError("Credenciales incorrectas");
+        return;
+    }
+
+    if (data?.session) {
+        // Supabase maneja la sesión automáticamente, pero también puedes guardar algo en localStorage si quieres
+        localStorage.setItem("user", JSON.stringify(data.user));
+        toast.success("Inicio de sesión exitoso 🎉");
+        onClose();
+    }
+};
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({
@@ -61,10 +70,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                         <p className="text-white/90">
                             Accede a tu cuenta para publicar productos
                         </p>
-                        <p className="text-white/90 bg-pink-500 text-center py-2 rounded-xl">
-                            Contáctame para obtener las credenciales
-                        </p>
-
+                       
                     </div>
                 </div>
 
