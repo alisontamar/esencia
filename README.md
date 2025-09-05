@@ -1,17 +1,17 @@
-# Homemart
+# Esencia
 
-![Catálogo online homemart](https://homemart-two.vercel.app/homemart.webp)
+![Catálogo online Esencia](https://Esencia-two.vercel.app/Esencia.webp)
 
-## ¿Qué es Homemart?
+## ¿Qué es Esencia?
 
-Homemart es un catálogo online para que los negocios puedan publicar sus productos de manera online y ya no transcurrir a catálogos hechos en pdf o sin formato. Actualmente, está enfocado a productos de belleza y productos para el hogar.
+Esencia es un catálogo online para que los negocios puedan publicar sus productos de manera online y ya no transcurrir a catálogos hechos en pdf o sin formato. Actualmente, está enfocado a productos de belleza y productos para el hogar.
 
 
 ## ¿Cómo colaborar?
 
 1. Clona el repositorio
 ```bash 
-git clone https://github.com/RodrigoKND/homemart.git
+git clone https://github.com/RodrigoKND/Esencia.git
 ```
 2. Instala las dependencias
 ```bash
