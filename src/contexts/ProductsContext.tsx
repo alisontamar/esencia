@@ -24,18 +24,26 @@ export default function ProductsProvider({ children }: { children: ReactNode }) 
     }, []);
 
     const loadingData = async () => {
-        const categories = await CategoryService.fetchCategories();
-        const brands = await BrandService.fetchBrands();
-        const products = await ProductService.fetchProducts();
-        const mostRequestedProducts = await AnalyticsService.fetchMostRequestedProducts();
+  const categories = await CategoryService.fetchCategories();
+  const brands = await BrandService.fetchBrands();
 
-        setCategories(categories);
-        setBrands(brands);
-        setProducts(products as Product[]);
-        setMostRequestedProducts(mostRequestedProducts);
-        setLoading(false);
+  // Traer productos con nombre de marca y categoría
+  const productsRaw = await ProductService.fetchProducts();
+  const productsWithNames = productsRaw.map((p: any) => ({
+    ...p,
+    marca_nombre: brands.find(b => b.id === p.marca_id)?.nombre || '',
+    categoria_nombre: categories.find(c => c.id === p.categoria_id)?.nombre || '',
+  }));
 
-    };
+  const mostRequestedProducts = await AnalyticsService.fetchMostRequestedProducts();
+
+  setCategories(categories);
+  setBrands(brands);
+  setProducts(productsWithNames as Product[]);
+  setMostRequestedProducts(mostRequestedProducts);
+  setLoading(false);
+};
+
 
     // Product operations
     const fetchProducts = async (filters?: ProductFilters) => {

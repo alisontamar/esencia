@@ -3,9 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { Search, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { products } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 import AuthModal from '@/components/AuthModal';
 import AddProductForm from './AddProduct';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/services/supabaseClient';
+import toast from 'react-hot-toast';
+
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,26 +26,21 @@ export const Header = () => {
     return location.pathname === path;
   };
 
-  const storedProducts = sessionStorage.getItem('products');
-  let productsFromStorage = [];
-  try {
-    productsFromStorage = storedProducts ? JSON.parse(storedProducts) : [];
-  } catch (error) {
-    console.error('Error parsing stored products:', error);
-    productsFromStorage = [];
-  }
+const { products } = useProducts();
 
-  const allProducts = [...products, ...productsFromStorage];
   // Filter products based on search query
-  const searchSuggestions = allProducts.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchQuery.toLowerCase())
-  ).slice(0, 5);
+  const searchSuggestions = products
+  ?.filter(product =>
+    product.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.marcas?.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.categoria_nombre?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+  .slice(0, 5);
+
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  const getUserSessionTemp = sessionStorage.getItem('user');
+const { user, loading } = useAuth();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
   return (
@@ -53,10 +52,10 @@ export const Header = () => {
               {/* Logo */}
               <Link to="/" className="flex items-center space-x-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">H</span>
+                  <span className="text-white font-bold text-xl">E</span>
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
-                  HomeMart
+                  Esencia
                 </span>
               </Link>
 
@@ -94,11 +93,24 @@ export const Header = () => {
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     className="pl-10 w-64 bg-gray-50 border-gray-200 focus:bg-white focus:border-pink-300"
                   />
-                  <Button className='bg-pink-500 hover:bg-pink-600 text-white'
-                    onClick={() => getUserSessionTemp ? setIsPostModalOpen(true) : setIsLoginModalOpen(true)}
-                  >
-                    {getUserSessionTemp ? 'Publicar' : 'Iniciar Sesión'}
-                  </Button>
+                <Button
+  className="bg-pink-500 hover:bg-pink-600 text-white"
+  onClick={() => user ? setIsPostModalOpen(true) : setIsLoginModalOpen(true)}
+>
+  {user ? 'Publicar' : 'Iniciar Sesión'}
+</Button>
+{user && (
+  <Button
+    className="ml-2 bg-red-500 hover:bg-red-600 text-white"
+    onClick={async () => {
+      await supabase.auth.signOut();
+      toast.success('Sesión cerrada 🎉');
+    }}
+  >
+    Cerrar sesión
+  </Button>
+)}
+
                 </div>
                 {/* Search Suggestions */}
                 {showSuggestions && searchSuggestions.length > 0 && (
@@ -114,17 +126,15 @@ export const Header = () => {
                         }}
                         className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                       >
-                        <img
-                          src={product.image}
-                          alt={product.name}
+                        <img src={product.imagen_url} alt={product.nombre}
                           className="w-10 h-10 object-cover rounded-lg mr-3"
                         />
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                            {product.name}
+                            {product.nombre}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {product.brand} • ${product.price}
+                            {product.marcas?.nombre} • ${product.precio_base}
                           </p>
                         </div>
                       </Link>
@@ -192,18 +202,16 @@ export const Header = () => {
                           }}
                           className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                         >
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-10 h-10 object-cover rounded-lg mr-3"
-                          />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                              {product.name}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {product.brand} • ${product.price}
-                            </p>
+                         <img src={product.imagen_url} alt={product.nombre}
+                          className="w-10 h-10 object-cover rounded-lg mr-3"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                            {product.nombre}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {product.marcas?.nombre} • ${product.precio_base}
+                          </p>
                           </div>
                         </Link>
                       ))}

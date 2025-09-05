@@ -50,10 +50,11 @@ export const FilterSidebar = ({
   };
 
   const activeFiltersCount =
-    filters[0].marca.length +
-    filters[0].categoria.length +
-    (filters[0].precio.max > 0 || filters[0].precio.min > 0 ? 1 : 0) +
-    (filters[0].busqueda ? 1 : 0);
+  filters.marca.length +
+  filters.categoria.length +
+  (filters.precio.max > 0 || filters.precio.min > 0 ? 1 : 0) +
+  (filters.busqueda ? 1 : 0);
+
 
   return (
     <div className={`bg-white rounded-lg border border-gray-200 md:p-6 ${className}`}>
@@ -83,12 +84,13 @@ export const FilterSidebar = ({
             )}
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3">
-            <Input
-              placeholder="Buscar productos..."
-              value={filters.search}
-              onChange={(e) => onFiltersChange({ search: e.target.value })}
-              className="w-full"
-            />
+           <Input
+  placeholder="Buscar productos..."
+  value={filters.busqueda}
+  onChange={(e) => onFiltersChange({ busqueda: e.target.value })}
+  className="w-full"
+/>
+
           </CollapsibleContent>
         </Collapsible>
 
@@ -110,13 +112,11 @@ export const FilterSidebar = ({
                 brands?.map((brand) => (
                   <div key={brand.id} className="flex items-center space-x-2">
                     <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`brand-${brand.nombre}`}
-                        checked={filters[0].marca.includes(brand.nombre)}
-                        onCheckedChange={(checked) =>
-                          handleBrandChange(brand.nombre, checked as boolean)
-                        }
-                      />
+                    <Checkbox
+  checked={filters.marca.includes(brand.nombre)}
+  onCheckedChange={() => onFiltersChange({ marca: brand.nombre })}
+/>
+
                       <Label
                         htmlFor={`brand-${brand.nombre}`}
                         className="text-sm font-normal cursor-pointer"
@@ -147,19 +147,18 @@ export const FilterSidebar = ({
             <div className="space-y-3">
               {categories?.map((category) => (
                 <div key={category.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`category-${category}`}
-                    checked={filters[0].categoria.includes(category.nombre)}
-                    onCheckedChange={(checked) =>
-                      handleCategoryChange(category.nombre, checked as boolean)
-                    }
-                  />
-                  <Label
-                    htmlFor={`category-${category.nombre}`}
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    {category.nombre}
-                  </Label>
+                  
+<Checkbox
+  checked={filters.categoria.includes(category.nombre)}
+  onCheckedChange={() => onFiltersChange({ categoria: category.nombre })}
+/>
+<Label
+  htmlFor={`category-${category.nombre}`}
+  className="text-sm font-normal cursor-pointer"
+>
+  {category.nombre}
+</Label>
+
                 </div>
               ))}
             </div>
