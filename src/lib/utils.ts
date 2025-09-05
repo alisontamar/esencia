@@ -5,21 +5,24 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function handleWhatsAppClick() {
-  // let message = `Hola! Me interesa el producto: ${product.name} de ${product.brand}.`
+export function handleWhatsAppClick(product, quantity = 1) {
+  if (!product) {
+    console.error("No se pasó product a handleWhatsAppClick");
+    return;
+  }
 
-  // if (quantity === 1) {
-  //   message += ` Precio: $${product.price}`
-  // } else {
-  //   message += ` Cantidad: ${quantity} unidades. Precio unitario: $${product.price}. Total: $${totalPrice}`
-  // }
+  let message = `Hola! Me interesa el producto: ${product.nombre} de ${product.marcas?.nombre ?? "Sin marca"}.`;
 
-  const message = `Me gustaria este sitio para mi tienda, por favor, más información`;
+  if (quantity === 1) {
+    message += ` Precio: Bs${product.precio_base}`;
+  } else {
+    const totalPrice = product.precio_base * quantity;
+    message += ` Cantidad: ${quantity} unidades. Precio unitario: $${product.precio_base}. Total: $${totalPrice}`;
+  }
 
   const phoneNumber = "79710328";
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-    message
-  )}`;
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, "_blank");
 }
+
 
