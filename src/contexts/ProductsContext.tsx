@@ -50,7 +50,6 @@ class SimpleCache {
     if (!entry) return null;
     
     if (this.isValid(entry)) {
-      console.log(`📦 Cache hit: ${key}`);
       return entry.data;
     }
     
@@ -60,25 +59,23 @@ class SimpleCache {
 
   set<T>(key: string, data: T, ttl: number): void {
     this.cache[key] = { data, timestamp: Date.now(), ttl };
-    console.log(`💾 Cache set: ${key}`);
   }
 
   invalidate(pattern: string): void {
     Object.keys(this.cache).forEach(key => {
       if (key.startsWith(pattern)) {
         delete this.cache[key];
-        console.log(`🗑️ Cache invalidated: ${key}`);
       }
     });
   }
 
-  clear(): void {
-    const count = Object.keys(this.cache).length;
+  clear(): boolean {
+    const count =Object.keys(this.cache).length;
     this.cache = {};
-    console.log(`🧹 Cache cleared: ${count} entries`);
+    return count > 0;
   }
 
-  cleanup(): void {
+  cleanup(): boolean {
     let removed = 0;
     Object.keys(this.cache).forEach(key => {
       if (!this.isValid(this.cache[key])) {
@@ -86,7 +83,7 @@ class SimpleCache {
         removed++;
       }
     });
-    if (removed > 0) console.log(`🧽 Cleanup: ${removed} expired entries`);
+    return removed > 0;
   }
 
   getStats() {
@@ -243,9 +240,7 @@ const createProduct = async (data: CreateProductData) => {
         
         // 3. ✅ CLAVE: Recargar los datos automáticamente
         await loadingData();
-        
-        console.log('✅ Producto creado y datos actualizados automáticamente');
-        
+                
     } catch (error) {
         if (error instanceof Error) {
             setError(error.message);
