@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { SortAsc, SortDesc } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,31 +9,29 @@ import { MobileFilterDrawer } from '@/components/MobileFilterDrawer';
 import { useFilters } from '@/hooks/useFilters';
 import { useMobile } from '@/hooks/useMobile';
 import { useProducts } from '@/hooks/useProducts';
+import { useBrand } from '@/hooks/useBrand';
+import { useCategory } from '@/hooks/useCategory';
 import { Product } from '@/types/database.types';
+import { SEO } from '@/components/SEO';
 
 export const CatalogPage = () => {
-  const [searchParams] = useSearchParams();
+  const { category } = useParams();
   const { products, loading } = useProducts();
+  const { categories } = useCategory();
+  const {brands} = useBrand();
   const [sortBy, setSortBy] = useState('nombre');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const isMobile = useMobile();
-
   const { filters, filteredProducts, updateFilters, clearFilters } = useFilters(products);
 
   // Apply URL params to filters
-useEffect(() => {
-  const category = searchParams.get('category');
-  const brand = searchParams.get('brand');
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const newFilters: any = {};
 
-  const newFilters: any = {};
-
- if (category) newFilters.categoria = category; // sin array
-
-  if (brand) newFilters.marca = [brand];
-
-  updateFilters(newFilters);
-}, [searchParams]);
-
+    if (category) newFilters.categoria = category.split('-').join(' '); // sin array
+    updateFilters(newFilters);
+  }, [category]);
 
 
   const sortedProducts = filteredProducts.sort((a: Product, b: Product) => {
@@ -64,10 +62,17 @@ useEffect(() => {
     }
   });
 
-
-  console.log(products, filters, filteredProducts)
+  const productsNames = products.map(p => p.nombre).join(', ');
+  const categoriesNames = categories.map(p => p.nombre).join(', ');
+  const brandsNames = brands.map(p => p.nombre).join(', ');
   return (
     <section className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100">
+      <SEO
+        title="Esencia | Tendencias de belleza"
+        description={`
+Descubre los mejores productos de belleza para tu rutina diaria, combinando tendencias actuales, ingredientes naturales y ecológicos, ideales para todo tipo de piel, cabello y rostro. Encuentra productos de alta calidad a precios accesibles, incluyendo: ${productsNames}, en categorías como ${categoriesNames}, y de marcas reconocidas como ${brandsNames}. ¡Resalta tu belleza natural con Esencia, tu tienda de confianza!
+`}
+      />
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         {/* Results Count */}
         <div className="mb-3 sm:mb-6 px-2 sm:px-4">
