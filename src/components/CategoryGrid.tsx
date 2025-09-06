@@ -49,7 +49,7 @@ export const CategoryGrid = () => {
           {categories?.map((category, index) => (
             <Link
               key={category.id}
-             to={`/catalog?category=${encodeURIComponent(category.nombre)}`}
+              to={`/catalog/category/${category.nombre.split(' ').join('-')}`}
               className="group"
             >
               <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 border-0 rounded-3xl bg-white">
@@ -57,7 +57,6 @@ export const CategoryGrid = () => {
                   <img
                     src={categoryImages[index]}
                     alt={category.nombre}
-                    loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
