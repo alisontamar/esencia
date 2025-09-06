@@ -26,6 +26,8 @@ export const BrandCarousel = () => {
                 <img
                   src="https://natura-site-bo-assets.s3.amazonaws.com/app/uploads/2022/03/09143854/logo_natura_mb.svg"
                   alt="Logo Natura"
+                  width={200}
+                  height={200}
                   className="w-auto object-cover hover:scale-110 transition-transform duration-300"
                 />
               </div>
@@ -33,7 +35,7 @@ export const BrandCarousel = () => {
 
             {/* Función explicativa */}
             <div className="text-left space-y-3">
-              <h4 className="text-lg font-semibold text-orange-700">¿Qué es Natura?</h4>
+              <h3 className="text-lg font-semibold text-orange-700">¿Qué es Natura?</h3>
               <p className="text-gray-700 leading-relaxed">
                 Natura es una marca de cosméticos y productos de cuidado personal que
                 combina innovación con sostenibilidad. Su propósito es generar un
