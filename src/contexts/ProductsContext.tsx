@@ -237,7 +237,7 @@ const createProduct = async (data: CreateProductData) => {
         cache.invalidate('products_raw');
         cache.invalidate('products_by_category');
         cache.invalidate('most_requested');
-        
+        product
         // 3. ✅ CLAVE: Recargar los datos automáticamente
         await loadingData();
                 
