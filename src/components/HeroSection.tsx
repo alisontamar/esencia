@@ -8,17 +8,15 @@ export const HeroSection = () => {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Main Content */}
           <div className="space-y-6">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold">
               Transforma tu
               <br />
-              <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-pink-600">
                 Cuidado Personal
               </span>
             </h1>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Descubre productos de calidad premium para el cuidado personal. Nos brindamos una
-              amplia variedad de productos para que puedas elegir lo que más te
-              convenga.
+              Productos premium para tu cuidado personal. Encuentra lo mejor para ti y elige calidad en cada detalle.
             </p>
           </div>
 
