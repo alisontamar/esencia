@@ -14,6 +14,7 @@ import { useCategory } from '@/hooks/useCategory';
 import { Product } from '@/types/database.types';
 import { SEO } from '@/components/SEO';
 
+
 export const CatalogPage = () => {
   const { category } = useParams();
   const { products, loading } = useProducts();
@@ -22,16 +23,17 @@ export const CatalogPage = () => {
   const [sortBy, setSortBy] = useState('nombre');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const isMobile = useMobile();
-  const { filters, filteredProducts, updateFilters, clearFilters } = useFilters(products);
+const { filters, filteredProducts, updateFilters, clearFilters } = useFilters({ products });
+
 
   // Apply URL params to filters
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    const newFilters: any = {};
+ useEffect(() => {
+  window.scrollTo(0, 0);
+  const newFilters: Partial<ProductFilters> = {};
 
-    if (category) newFilters.categoria = category.split('-').join(' '); // sin array
-    updateFilters(newFilters);
-  }, [category]);
+  if (category) newFilters.categoria = [category.split('-').join(' ')];
+  updateFilters(newFilters);
+}, [category]);
 
 
   const sortedProducts = filteredProducts.sort((a: Product, b: Product) => {

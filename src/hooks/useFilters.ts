@@ -1,13 +1,23 @@
 import { useState, useMemo } from "react";
+import { ProductWithOffer } from "@/types/database.types";
+interface ProductFilters {
+  marca: string[];
+  categoria: string[];
+  precio: { min: number; max: number };
+  busqueda: string;
+}
 
-export const useFilters = (products) => {
-  const [filters, setFilters] = useState({
+interface UseFiltersProps {
+  products: ProductWithOffer[];
+}
+
+export const useFilters = ({ products }: UseFiltersProps) => {
+  const [filters, setFilters] = useState<ProductFilters>({
     marca: [],
     categoria: [],
     precio: { min: 0, max: 0 },
     busqueda: "",
   });
-
   const filteredProducts = useMemo(() => {
     return products?.filter((product) => {
       // --- Filtro por marca ---
@@ -55,7 +65,7 @@ export const useFilters = (products) => {
   }, [products, filters]);
 
   // --- Nuevo updateFilters con toggle automático ---
-const updateFilters = (newFilters) => {
+const updateFilters = (newFilters: Partial<ProductFilters>) => {
   setFilters((prev) => ({
     marca: newFilters.marca
       ? Array.isArray(newFilters.marca)
@@ -77,6 +87,7 @@ const updateFilters = (newFilters) => {
         : prev.busqueda,
   }));
 };
+
 
 
   const clearFilters = () => {
