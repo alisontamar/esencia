@@ -31,19 +31,23 @@ export default function DynamicProductForm({ onClose }: { onClose: () => void })
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [finalPrice, setFinalPrice] = useState<number>(0);
 
-  useEffect(() => {
-    if (!product.isOffer || product.offerValue <= 0) {
-      setFinalPrice(product.price);
-      return;
-    }
-    if (product.offerType === 'fixed') {
-      setFinalPrice(product.offerValue > product.price ? product.price : product.offerValue);
-    } else {
-      const discount = (product.price * product.offerValue) / 100;
-      const priceAfter = product.price - discount;
-      setFinalPrice(priceAfter < 0 ? 0 : priceAfter);
-    }
-  }, [product.price, product.isOffer, product.offerValue, product.offerType]);
+useEffect(() => {
+  if (!product.isOffer || product.offerValue <= 0) {
+    setFinalPrice(product.price);
+    return;
+  }
+
+  if (product.offerType === 'precio_fijo') {
+    // ✅ Aquí el valor es el PRECIO FINAL, no un descuento
+    setFinalPrice(product.offerValue);
+  } else if (product.offerType === 'porcentaje_descuento') {
+    const discount = (product.price * product.offerValue) / 100;
+    const priceAfter = product.price - discount;
+    setFinalPrice(priceAfter < 0 ? 0 : priceAfter);
+  }
+}, [product.price, product.isOffer, product.offerValue, product.offerType]);
+
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -79,87 +83,89 @@ export default function DynamicProductForm({ onClose }: { onClose: () => void })
     reader.readAsDataURL(uploadedFile);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (finalPrice > product.price) {
-      toast.error("El precio final no puede ser mayor que el precio original");
-      return;
+  if (finalPrice > product.price) {
+    toast.error("El precio final no puede ser mayor que el precio original");
+    return;
+  }
+
+  if (
+    product.brand === "" ||
+    product.description === "" ||
+    product.category === "" ||
+    product.quantity === 0 ||
+    product.price === 0 ||
+    !file
+  ) {
+    toast.error("Todos los campos son obligatorios, a excepción de oferta");
+    return;
+  }
+
+  try {
+    // 1. Subir imagen a Supabase Storage
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const { error: uploadError } = await supabase.storage
+      .from("products")
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    // 2. Obtener URL pública
+    const { data: urlData } = supabase.storage
+      .from("products")
+      .getPublicUrl(fileName);
+
+    const imageUrl = urlData.publicUrl;
+
+    // 3. Insertar producto en DB
+    const { data: insertedProduct, error: insertError } = await supabase
+      .from("productos")
+      .insert([
+        {
+          nombre: product.name,
+          descripcion: product.description,
+          marca_id: product.brand,       // UUID
+          categoria_id: product.category, // UUID
+          cantidad: product.quantity,
+          precio_base: product.price,
+          imagen_url: imageUrl,
+          esta_en_oferta: product.isOffer,
+          es_destacado: product.isHighlighted,
+        },
+      ])
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+
+    // 4. Si tiene oferta, insertarla en tabla `ofertas`
+    if (product.isOffer) {
+      const { error: offerError } = await supabase.from("ofertas").insert([
+        {
+          producto_id: insertedProduct.id,
+          tipo_oferta: product.offerType || "precio_fijo",
+          valor_descuento: product.offerValue || 0,
+          precio_especial:
+            product.offerType === "precio_fijo" ? product.offerValue : null,
+          precio_final: finalPrice, // ✅ calculado en useEffect
+          fecha_fin: product.offerUntil || null,
+        },
+      ]);
+      if (offerError) throw offerError;
     }
 
-    if (
-      product.brand === "" ||
-      product.description === "" ||
-      product.category === "" ||
-      product.quantity === 0 ||
-      product.price === 0 ||
-      !file
-    ) {
-      toast.error("Todos los campos son obligatorios, a excepción de oferta");
-      return;
-    }
+    toast.success("Producto publicado!");
+    onClose();
+  } catch (error) {
+    console.error(error);
+    toast.error("Error al guardar el producto");
+  }
+  
+};
 
-    try {
-      // 1. Subir imagen a Supabase Storage
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage
-        .from("products")
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      // 2. Obtener URL pública
-      const { data: urlData } = supabase.storage
-        .from("products")
-        .getPublicUrl(fileName);
-
-      const imageUrl = urlData.publicUrl;
-
-      // 3. Insertar producto en DB
-      const { data: insertedProduct, error: insertError } = await supabase
-        .from("productos")
-        .insert([
-          {
-            nombre: product.name,
-            descripcion: product.description,
-            marca_id: product.brand,       // 👈 debe ser UUID
-            categoria_id: product.category, // 👈 debe ser UUID
-            cantidad: product.quantity,
-            precio_base: product.price,
-            imagen_url: imageUrl,
-            esta_en_oferta: product.isOffer,
-            es_destacado: product.isHighlighted,
-          },
-        ])
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
-
-      // 4. Si tiene oferta, insertarla en tabla `ofertas`
-      if (product.isOffer) {
-        console.log(product.offerType);
-        const { error: offerError } = await supabase.from("ofertas").insert([
-          {
-            producto_id: insertedProduct.id,
-            tipo_oferta: product.offerType || "precio_fijo",
-            valor_descuento: product.offerValue || 0,
-            precio_especial: finalPrice,
-            precio_final: finalPrice,
-            fecha_fin: product.offerUntil || null,
-          },
-        ]);
-        if (offerError) throw offerError;
-      }
-
-      toast.success("Producto publicado!");
-      onClose();
-    } catch (error) {
-      console.error(error);
-      toast.error("Error al guardar el producto");
-    }
-  };
 
 
   return (
