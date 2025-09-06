@@ -230,7 +230,7 @@ const createProduct = async (data: CreateProductData) => {
 
         // 1. Crear el producto
         const product = await ProductService.createProduct(data);
-        
+        console.log(product);
         // 2. Invalidar TODO el cache relacionado
         cache.invalidate('products');
         cache.invalidate('filtered_products');
