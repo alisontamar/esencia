@@ -15,7 +15,7 @@ const categoryImages = [
 
 
 const categoryColors = [
-  'from-pink-400 to-pink-500',
+  'from-pink-400 tco-pink-500',
   'from-purple-400 to-purple-500',
   'from-blue-400 to-blue-500',
   'from-green-400 to-green-500',

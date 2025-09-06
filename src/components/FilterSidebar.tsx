@@ -34,20 +34,21 @@ export const FilterSidebar = ({
   };
 
   const handleCategoryChange = (category: string, checked: boolean) => {
-    const newCategories = checked
-      ? [...filters[0].categoria, category]
-      : filters[0].categoria.filter(c => c !== category);
+  const newCategories = checked
+    ? [...filters.categoria, category]
+    : filters.categoria.filter(c => c !== category);
 
-    onFiltersChange({ categoria: newCategories });
-  };
+  onFiltersChange({ categoria: newCategories });
+};
 
-  const handleBrandChange = (brand: string, checked: boolean) => {
-    const newBrands = checked
-      ? [...filters[0].marca, brand]
-      : filters[0].marca.filter(c => c !== brand);
+const handleBrandChange = (brand: string, checked: boolean) => {
+  const newBrands = checked
+    ? [...filters.marca, brand]
+    : filters.marca.filter(c => c !== brand);
 
-    onFiltersChange({ marca: newBrands });
-  };
+  onFiltersChange({ marca: newBrands });
+};
+
 
   const activeFiltersCount =
   filters.marca.length +
@@ -112,10 +113,11 @@ export const FilterSidebar = ({
                 brands?.map((brand) => (
                   <div key={brand.id} className="flex items-center space-x-2">
                     <div className="flex items-center space-x-2">
-                    <Checkbox
+                   <Checkbox
   checked={filters.marca.includes(brand.nombre)}
-  onCheckedChange={() => onFiltersChange({ marca: brand.nombre })}
+  onCheckedChange={(checked) => handleBrandChange(brand.nombre, !!checked)}
 />
+
 
                       <Label
                         htmlFor={`brand-${brand.nombre}`}
@@ -150,7 +152,7 @@ export const FilterSidebar = ({
                   
 <Checkbox
   checked={filters.categoria.includes(category.nombre)}
-  onCheckedChange={() => onFiltersChange({ categoria: category.nombre })}
+  onCheckedChange={(checked) => handleCategoryChange(category.nombre, !!checked)}
 />
 <Label
   htmlFor={`category-${category.nombre}`}

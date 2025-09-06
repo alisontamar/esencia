@@ -32,6 +32,7 @@ export interface Product {
   created_at: string;
   updated_at: string;
   marcas?: {nombre: string};
+    ofertas?: Offer[];
 }
 
 export interface Offer {
@@ -119,7 +120,13 @@ export interface ProductsContextType {
   createBrand: (name: string, description?: string) => Promise<void>;
   fetchProductsByCategory: () => Promise<void>;
   registerWhatsAppConsultation: (productId: string, sessionData?: Partial<ConsultationData>) => Promise<void>;
+  // NEW: Cache management functions
+  clearCache: () => void;
+  getCacheStats: () => { total: number; valid: number; expired: number };
+  invalidateCache: (pattern: string) => void;
+  refreshData: () => Promise<void>;
 }
+
 
 export interface ProductFilters {
   category?: string;
@@ -147,6 +154,7 @@ export interface ProductByCategory extends Product {
   cantidad: number;
   created_at: string;
   updated_at: string;
+    ofertas?: Offer[];
 }
 
 export interface ConsultationData {

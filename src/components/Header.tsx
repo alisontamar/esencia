@@ -15,6 +15,7 @@ import { SprayCan } from 'lucide-react';
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  
   const [showSuggestions, setShowSuggestions] = useState(false);
   const location = useLocation();
 
@@ -221,14 +222,16 @@ export const Header = () => {
                   )}
                 </div>
 
-                {/* Botón de sesión */}
-                {
-                  <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white"
-                    onClick={() => getUserSessionTemp ? setIsPostModalOpen(true) : setIsLoginModalOpen(true)}
-                  >
-                    {getUserSessionTemp ? 'Publicar' : 'Iniciar Sesión'}
-                  </Button>
-                }
+               
+                {/* Botón de sesión */}  
+<Button
+  className="w-full bg-pink-500 hover:bg-pink-600 text-white"
+  onClick={() => user ? setIsPostModalOpen(true) : setIsLoginModalOpen(true)}
+>
+  {user ? 'Publicar' : 'Iniciar Sesión'}
+</Button>
+
+                
               </div>
             </div>
 

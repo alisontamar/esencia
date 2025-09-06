@@ -2,6 +2,7 @@ import { supabase } from "@/model/createClient";
 import { CreateProductData, Product, ProductFilters, ProductByCategory } from "@/types/database.types";
 
 export const ProductService = {
+    
     async productsOffer(filters?: ProductFilters): Promise<Product[]> {
         let query = supabase
             .from('v_productos_con_ofertas')
@@ -104,16 +105,57 @@ export const ProductService = {
         return data;
     },
 
-    async fetchProductById(id: string): Promise<Product> {
-        const { data, error } = await supabase
-            .from('productos')
-            .select('*')
-            .eq('id', id)
-            .single();
+ async fetchProductById(id: string): Promise<Product> {
+  const { data, error } = await supabase
+    .from("productos")
+    .select(`
+      *,
+      marcas (nombre),
+      categorias (nombre),
+      ofertas!ofertas_producto_id_fkey (
+        precio_final,
+        precio_especial,
+        valor_descuento,
+        tipo_oferta,
+        activa,
+        fecha_inicio,
+        fecha_fin
+      )
+    `)
+    .eq("id", id)
+    .single();
 
-        if (error) throw error;
-        return data || [];
-    },
+  if (error) throw error;
+
+  return {
+    ...data,
+    marcas: Array.isArray(data?.marcas)
+      ? data.marcas[0]
+      : data?.marcas ?? { nombre: "Genérico" },
+    categorias: Array.isArray(data?.categorias)
+      ? data.categorias[0]
+      : data?.categorias ?? { nombre: "" },
+    ofertas: Array.isArray(data?.ofertas)
+      ? data.ofertas
+      : data?.ofertas
+      ? [data.ofertas]
+      : [],
+  };
+
+
+  return {
+    ...data,
+    // normalizar marca
+    marcas: Array.isArray(data?.marcas)
+      ? data.marcas[0]
+      : data?.marcas ?? { nombre: "Genérico" },
+    // normalizar categoría
+    categorias: Array.isArray(data?.categorias)
+      ? data.categorias[0]
+      : data?.categorias ?? { nombre: "" },
+  };
+},
+
     
     async fetchProductsByCategory(): Promise<ProductByCategory[] | []> {
         const { data, error } = await supabase
@@ -130,5 +172,6 @@ export const ProductService = {
                 : item?.categorias ?? "",
         }));
     },
+    
 
 };

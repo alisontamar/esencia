@@ -11,10 +11,15 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 
 export const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
+  
   const [quantity, setQuantity] = useState(1);
   const { loading, fetchProductById, selectedProduct: product, fetchProductsByCategory, productsByCategory } = useProducts();
   const { categories } = useCategory();
   const { registerWhatsAppConsultation } = useAnalytics();
+const ofertaActiva = product?.ofertas?.[0]?.activa;
+const precioUnitario = ofertaActiva
+  ? product?.ofertas?.[0]?.precio_final
+  : product?.precio_base;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -103,12 +108,24 @@ export const ProductPage = () => {
               </div>
 
               {/* Price Section */}
-              <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg p-6 space-y-4">
-                {/* Unit Price */}
-                <div className="flex justify-between items-center">
-                  <span className="text-lg text-gray-600">Precio unitario:</span>
-                  <span className="text-2xl font-bold text-gray-800">{product?.moneda} {product?.precio_base}</span>
-                </div>
+              <div className="flex justify-between items-center">
+  <span className="text-lg text-gray-600">Precio unitario:</span>
+  {ofertaActiva ? (
+    <div className="text-right">
+      <div className="text-sm line-through text-gray-500">
+        {product?.moneda} {product?.precio_base}
+      </div>
+      <div className="text-2xl font-bold text-pink-600">
+        {product?.moneda} {precioUnitario}
+      </div>
+    </div>
+  ) : (
+    <span className="text-2xl font-bold text-gray-800">
+      {product?.moneda} {precioUnitario}
+    </span>
+  )}
+</div>
+
 
                 {/* Quantity Selector */}
                 <div className="flex items-center justify-between">
@@ -124,16 +141,16 @@ export const ProductPage = () => {
                   </div>
                 </div>
 
-                {/* Total Price */}
-                {quantity > 1 && (
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg text-gray-600">Total ({quantity} unidades):</span>
-                      <span className="text-3xl font-bold text-pink-600">{product?.moneda} {product?.precio_base * quantity}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
+               {quantity > 1 && (
+  <div className="border-t border-gray-200 pt-4">
+    <div className="flex justify-between items-center">
+      <span className="text-lg text-gray-600">Total ({quantity} unidades):</span>
+      <span className="text-3xl font-bold text-pink-600">
+        {product?.moneda} {precioUnitario * quantity}
+      </span>
+    </div>
+  </div>
+)}
 
               {/* WhatsApp Button */}
               <div className="space-y-4">
@@ -147,17 +164,19 @@ export const ProductPage = () => {
 >
   <MessageCircle className="w-5 h-5 mr-2" />
   {quantity === 1
-    ? `Consultar por WhatsApp - $${product?.precio_base}`
+    ? `Consultar por WhatsApp - ${product?.moneda}${precioUnitario}`
     : `Consultar por WhatsApp - ${quantity} unidades (${product?.moneda})`}
 </Button>
 
 
+
                 {/* Price breakdown for multiple items */}
-                {quantity > 1 && (
-                  <div className="text-center text-sm text-gray-600">
-                    {quantity} × ${product?.precio_base} = ${product?.precio_base * quantity}
-                  </div>
-                )}
+              {quantity > 1 && (
+  <div className="text-center text-sm text-gray-600">
+    {quantity} × {product?.moneda}{precioUnitario} = {product?.moneda}{precioUnitario * quantity}
+  </div>
+)}
+
               </div>
             </div>
           </div>
