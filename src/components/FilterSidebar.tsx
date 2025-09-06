@@ -8,13 +8,28 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Separator } from '@/components/ui/separator';
 import { useCategory } from '@/hooks/useCategory';
 import { useBrand } from '@/hooks/useBrand';
-
+interface Props {
+  filters: {
+    busqueda: string;
+    marca: string[];
+    categoria: string[];
+    precio: { min: number; max: number };
+  };
+  onFiltersChange: (filters: Partial<{
+    busqueda: string;
+    marca: string[];
+    categoria: string[];
+    precio: { min: number; max: number };
+  }>) => void;
+  onClearFilters: () => void;
+  className?: string;
+}
 export const FilterSidebar = ({
   filters,
   onFiltersChange,
   onClearFilters,
   className = ""
-}) => {
+}: Props)=> {
 
   const { categories } = useCategory();
   const { brands } = useBrand();
