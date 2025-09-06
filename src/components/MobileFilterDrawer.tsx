@@ -16,10 +16,10 @@ export const MobileFilterDrawer = ({
   onClearFilters, 
 }: MobileFilterDrawerProps) => {
   const activeFiltersCount = 
-    filters.brand.length + 
-    filters.category.length + 
-    (filters.priceRange ? 1 : 0) + 
-    (filters.search ? 1 : 0);
+    filters.marca.length + 
+    filters.categoria.length + 
+    (filters.precio ? 1 : 0) + 
+    (filters.busqueda ? 1 : 0);
 
   return (
     <Sheet>
