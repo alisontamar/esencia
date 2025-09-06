@@ -1,29 +1,59 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { products } from '@/data/products';
+import { products as allProducts } from '@/data/products';
 import { ProductGrid } from '@/components/ProductGrid';
 import { Badge } from '@/components/ui/badge';
 import { useEffect } from 'react';
 import { useCategory } from '@/hooks/useCategory';
+import { ProductWithOffer, Category } from '@/types/database.types';
 
 export const BrandPage = () => {
   const { name } = useParams<{ name: string }>();
-  const {categories} = useCategory();
+  const { categories } = useCategory();
   const decodedName = decodeURIComponent(name || '');
-  
-  const brandProducts = products.filter(
-    product => product.brand.toLowerCase() === decodedName.toLowerCase()
+
+  // --- Mapear productos originales a ProductWithOffer ---
+const mappedProducts: ProductWithOffer[] = allProducts.map((p) => ({
+  id: p.id,
+  nombre: p.name,
+  marca_nombre: p.brand,
+  categoria_nombre: p.category,
+  precio_base: p.price,
+  cantidad: p.stock ?? 0,
+  descripcion: p.description,
+  imagen: p.image,
+  esta_en_oferta: false,
+  precio_actual: p.price,
+  total_consultas: 0,
+  consultas_semana: 0,
+  consultas_mes: 0,
+  es_destacado: p.featured ?? false,  // <--- agrega esta propiedad
+  destacado: p.featured ?? false,     // si la tienes en tu UI
+  created_at: new Date().toISOString(),  // <--- agrega valor por defecto
+  updated_at: new Date().toISOString(),  // <--- agrega valor por defecto
+}));
+
+  // --- Filtrar productos por marca ---
+  const brandProducts = mappedProducts.filter(
+    (product) => product.marca_nombre?.toLowerCase() === decodedName.toLowerCase()
   );
 
-  // Group products by category
-  const productsByCategory = categories.reduce((acc, category) => {
-    const categoryProducts = brandProducts.filter(product => product.category === category);
-    if (categoryProducts.length > 0) {
-      acc[category] = categoryProducts;
-    }
-    return acc;
-  }, {} as Record<string, typeof products>);
-  useEffect(()=> window.scrollTo(0,0))
+  // --- Agrupar productos por categoría ---
+  const productsByCategory: Record<string, ProductWithOffer[]> = (categories as Category[]).reduce(
+    (acc, category) => {
+      const categoryProducts = brandProducts.filter(
+        (product) => product.categoria_nombre === category.nombre
+      );
+      if (categoryProducts.length > 0) {
+        acc[category.nombre] = categoryProducts;
+      }
+      return acc;
+    },
+    {} as Record<string, ProductWithOffer[]>
+  );
+
+  useEffect(() => window.scrollTo(0, 0), []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100">
       <div className="px-4 py-8">
@@ -57,11 +87,11 @@ export const BrandPage = () => {
 
         {brandProducts.length > 0 ? (
           <div className="space-y-12">
-            {Object.entries(productsByCategory).map(([category, categoryProducts]) => (
-              <div key={category} className="bg-white rounded-3xl p-8 shadow-lg">
+            {Object.entries(productsByCategory).map(([categoryName, categoryProducts]) => (
+              <div key={categoryName} className="bg-white rounded-3xl p-8 shadow-lg">
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {category}
+                    {categoryName}
                   </h2>
                   <p className="text-gray-600">
                     {categoryProducts.length} productos en esta categoría

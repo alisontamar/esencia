@@ -9,12 +9,11 @@ import AddProductForm from './AddProduct';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/services/supabaseClient';
 import toast from 'react-hot-toast';
-
+import { ProductWithOffer } from '@/types/database.types';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  
   const [showSuggestions, setShowSuggestions] = useState(false);
   const location = useLocation();
 
@@ -23,24 +22,23 @@ export const Header = () => {
     { name: 'Catálogo', href: '/catalog' }
   ];
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
+  const isActive = (path: string) => location.pathname === path;
 
-  const { products } = useProducts();
+  // --- Tipado seguro para productos ---
+  const { products } = useProducts() as { products: ProductWithOffer[] };
 
-  // Filter products based on search query
   const searchSuggestions = products
-    ?.filter(product =>
-      product.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.marcas?.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.categoria_nombre?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    ?.filter(product => {
+      const name = product.nombre.toLowerCase();
+      const brand = product.marcas?.nombre?.toLowerCase() ?? '';
+      const category = product.categoria_nombre?.toLowerCase() ?? '';
+      const query = searchQuery.toLowerCase();
+
+      return name.includes(query) || brand.includes(query) || category.includes(query);
+    })
     .slice(0, 5);
 
-
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
   const { user } = useAuth();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 

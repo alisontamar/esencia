@@ -58,6 +58,7 @@ export interface ProductImage {
   created_at: string;
 }
 
+
 export interface ProductWithOffer extends Product {
   marca_nombre?: string;
   categoria_nombre?: string;

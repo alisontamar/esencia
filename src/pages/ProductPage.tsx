@@ -9,27 +9,41 @@ import { useProducts } from '@/hooks/useProducts';
 import { useCategory } from '@/hooks/useCategory';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { SEO } from '@/components/SEO';
+import { ProductWithOffer } from '@/types/database.types';
 
 export const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
-
   const [quantity, setQuantity] = useState(1);
-  const { loading, fetchProductById, selectedProduct: product, fetchProductsByCategory, productsByCategory } = useProducts();
+
+  const {
+    loading,
+    fetchProductById,
+    selectedProduct: product,
+    fetchProductsByCategory,
+    productsByCategory,
+  } = useProducts();
+
   const { categories } = useCategory();
   const { registerWhatsAppConsultation } = useAnalytics();
-  const ofertaActiva = product?.ofertas?.[0]?.activa;
+
+  // Valores seguros para TypeScript
+  const ofertaActiva = product?.ofertas?.[0]?.activa ?? false;
   const precioUnitario = ofertaActiva
-    ? product?.ofertas?.[0]?.precio_final
-    : product?.precio_base;
+    ? product?.ofertas?.[0]?.precio_final ?? 0
+    : product?.precio_base ?? 0;
+  const productName = product?.nombre ?? "Producto belleza";
+  const brandName = product?.marcas?.nombre ?? "Marca desconocida";
+  const categoryName = categories?.find(c => c.id === product?.categoria_id)?.nombre ?? "Categoría desconocida";
+  const productImage = product?.imagen_url ?? "";
+  const currency = product?.moneda ?? "Bs.";
 
   useEffect(() => {
     window.scrollTo(0, 0);
     if (id) {
-      fetchProductById(id as string);
+      fetchProductById(id);
       fetchProductsByCategory();
     }
-  }, []);
-
+  }, [id]);
 
   if (loading) {
     return (
@@ -55,23 +69,25 @@ export const ProductPage = () => {
     );
   }
 
-  const incrementQuantity = () => setQuantity((prev) => prev + 1)
-  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1))
+  const incrementQuantity = () => setQuantity(prev => prev + 1);
+  const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-pink-100">
-      <SEO title={`${product?.nombre || "Producto belleza"} | Esencia`} 
-      description={`✨ Descubre el producto cosmético de belleza ${product?.nombre}, creado por la marca Natura | ${product?.marcas?.nombre}, diseñado especialmente para realzar tu cuidado personal.
-🌸 Perteneciente a la categoría ${categories?.find(c => c.id === product?.categoria_id)?.nombre}, este producto combina calidad, innovación y resultados visibles, convirtiéndose en tu aliado ideal para resaltar tu belleza natural.`} image_url={product?.imagen_url ?? ''} />
+      <SEO
+        title={`${productName} | Esencia`}
+        description={`✨ Descubre el producto cosmético de belleza ${productName}, creado por la marca ${brandName}, diseñado especialmente para realzar tu cuidado personal. 🌸 Perteneciente a la categoría ${categoryName}, este producto combina calidad, innovación y resultados visibles, convirtiéndose en tu aliado ideal para resaltar tu belleza natural.`}
+        image_url={productImage}
+      />
       <div className="container mx-auto px-4 py-8">
         {/* Product Image */}
         <div className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto  items-center justify-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto items-center justify-center">
             {/* Main Image with Zoom */}
             <div className="relative">
               <ProductImageZoom
-                src={product?.imagen_url ?? ''}
-                alt={product?.nombre ?? ''}
+                src={productImage}
+                alt={productName}
                 className="aspect-square rounded-2xl bg-gray-100"
               />
               {product?.esta_en_oferta && (
@@ -79,21 +95,19 @@ export const ProductPage = () => {
                   Producto en oferta
                 </span>
               )}
-              {
-                product?.es_destacado && (
-                  <span className="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm px-3 py-1 rounded-full font-medium z-10">
-                    Producto destacado
-                  </span>
-                )
-              }
+              {product?.es_destacado && (
+                <span className="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm px-3 py-1 rounded-full font-medium z-10">
+                  Producto destacado
+                </span>
+              )}
             </div>
+
             {/* Product Info */}
             <div className="space-y-6">
-              {/* Brand and Title */}
               <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">{product?.marcas?.nombre}</p>
-                <h1 className="text-3xl font-bold text-gray-800 mb-4">{product?.nombre ?? ''}</h1>
-                <p className="text-lg text-gray-600">Categoría: {categories?.find(c => c.id === product?.categoria_id)?.nombre}</p>
+                <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">{brandName}</p>
+                <h1 className="text-3xl font-bold text-gray-800 mb-4">{productName}</h1>
+                <p className="text-lg text-gray-600">Categoría: {categoryName}</p>
               </div>
 
               {/* Price Section */}
@@ -102,19 +116,18 @@ export const ProductPage = () => {
                 {ofertaActiva ? (
                   <div className="text-right">
                     <div className="text-sm line-through text-gray-500">
-                      {product?.moneda} {product?.precio_base}
+                      {currency} {product?.precio_base ?? 0}
                     </div>
                     <div className="text-2xl font-bold text-pink-600">
-                      {product?.moneda} {precioUnitario}
+                      {currency} {precioUnitario}
                     </div>
                   </div>
                 ) : (
                   <span className="text-2xl font-bold text-gray-800">
-                    {product?.moneda} {precioUnitario}
+                    {currency} {precioUnitario}
                   </span>
                 )}
               </div>
-
 
               {/* Quantity Selector */}
               <div className="flex items-center justify-between">
@@ -135,7 +148,7 @@ export const ProductPage = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-lg text-gray-600">Total ({quantity} unidades):</span>
                     <span className="text-3xl font-bold text-pink-600">
-                      {product?.moneda} {precioUnitario * quantity}
+                      {currency} {precioUnitario * quantity}
                     </span>
                   </div>
                 </div>
@@ -145,27 +158,25 @@ export const ProductPage = () => {
               <div className="space-y-4">
                 <Button
                   onClick={() => {
-                    handleWhatsAppClick(product, quantity);
-                    registerWhatsAppConsultation(product?.id as string);
+                    if (product) {
+                      handleWhatsAppClick(product, quantity);
+                      if (product.id) registerWhatsAppConsultation(product.id);
+                    }
                   }}
                   size="lg"
                   className="w-full bg-green-500 hover:bg-green-600 text-white"
                 >
                   <MessageCircle className="w-5 h-5 mr-2" />
                   {quantity === 1
-                    ? `Consultar por WhatsApp - ${product?.moneda}${precioUnitario}`
-                    : `Consultar por WhatsApp - ${quantity} unidades (${product?.moneda})`}
+                    ? `Consultar por WhatsApp - ${currency}${precioUnitario}`
+                    : `Consultar por WhatsApp - ${quantity} unidades (${currency})`}
                 </Button>
 
-
-
-                {/* Price breakdown for multiple items */}
                 {quantity > 1 && (
                   <div className="text-center text-sm text-gray-600">
-                    {quantity} × {product?.moneda}{precioUnitario} = {product?.moneda}{precioUnitario * quantity}
+                    {quantity} × {currency}{precioUnitario} = {currency}{precioUnitario * quantity}
                   </div>
                 )}
-
               </div>
             </div>
           </div>
@@ -175,10 +186,10 @@ export const ProductPage = () => {
         {productsByCategory?.length > 0 && (
           <div className="mt-16">
             <h2 className="text-2xl font-bold text-gray-900 mb-8">Productos Relacionados</h2>
-            <ProductGrid products={productsByCategory} />
+            <ProductGrid products={productsByCategory as ProductWithOffer[]} />
           </div>
         )}
       </div>
-    </section >
+    </section>
   );
 };
